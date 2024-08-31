@@ -1,16 +1,21 @@
 # app/main.py
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from app.db.session import connect_to_mongo, close_mongo_connection
 from app.api.api_v1.api import api_router#Look at chat
 
-app = FastAPI()
 
-@app.on_event("startup")
-async def startup_db_client():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     await connect_to_mongo()
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
+    yield
     await close_mongo_connection()
 
+app = FastAPI(lifespan=lifespan)
+
+#End point regisration
 app.include_router(api_router)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
