@@ -1,5 +1,3 @@
-// src/App.js
-
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -7,8 +5,8 @@ import Bookmarks from './pages/Bookmarks';
 import GlobalStyles from './styles/GlobalStyles';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
-import SellItem from './pages/SellItem'; 
-import Messages from './pages/Messages'; // Import the Messages component
+import SellItem from './pages/SellItem';
+import Messages from './pages/Messages';
 
 function App() {
   const [bookmarks, setBookmarks] = useState([]);
@@ -36,7 +34,7 @@ function App() {
           />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/sell-item" element={<SellItem />} />
-          <Route path="/messages" element={<Messages />} /> {/* Ensure this route exists */}
+          <Route path="/messages" element={<Messages />} />
         </Routes>
       </Layout>
     </Router>

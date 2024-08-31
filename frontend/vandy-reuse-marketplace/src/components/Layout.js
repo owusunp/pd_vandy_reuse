@@ -8,7 +8,7 @@ const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #B3A369; // Vanderbilt color
+  background-color: #0D324D; /* Vanderbilt dark blue */
   padding: 1rem 2rem;
 `;
 
@@ -35,9 +35,10 @@ const Layout = ({ children }) => {
           Reuse Vandy
         </Link>
         <NavLinks>
+          <NavLink to="/">Home</NavLink>
           <NavLink to="/messages">Messages</NavLink>
           <NavLink to="/sell-item">Sell Your Item</NavLink>
-          <NavLink to="/bookmarks">View Bookmarks</NavLink> {/* Added this line */}
+          <NavLink to="/bookmarks">View Bookmarks</NavLink>
         </NavLinks>
       </Navbar>
       <main>{children}</main>

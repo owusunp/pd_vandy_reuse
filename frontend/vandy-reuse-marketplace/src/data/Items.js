@@ -1,22 +1,26 @@
-// src/data/Items.js
-
 const items = [
-    {
-      id: 1,
-      name: 'Item 1',
-      description: 'This is the description for Item 1.',
-      price: 100,
-      image: '/path/to/image1.jpg', // Replace with actual image paths
-    },
-    {
-      id: 2,
-      name: 'Item 2',
-      description: 'This is the description for Item 2.',
-      price: 150,
-      image: '/path/to/image2.jpg',
-    },
-    // Add more items as needed
-  ];
-  
-  export default items; // Ensure this export is correct
-  
+  {
+    id: 1,
+    name: 'Women\'s Jacket',
+    price: '$30',
+    category: 'Women',
+    image: '/path/to/image1.jpg',
+  },
+  {
+    id: 2,
+    name: 'Men\'s Watch',
+    price: '$50',
+    category: 'Men',
+    image: '/path/to/image2.jpg',
+  },
+  {
+    id: 3,
+    name: 'Laptop',
+    price: '$300',
+    category: 'Electronics',
+    image: '/path/to/image3.jpg',
+  },
+  // Add more items with different categories
+];
+
+export default items;

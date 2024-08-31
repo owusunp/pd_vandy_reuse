@@ -1,0 +1,35 @@
+/* src/components/Header.css */
+/* src/components/Header.css */
+
+.header {
+    display: flex;
+    justify-content: flex-end; /* Aligns all items to the right */
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #003057; /* Vanderbilt's navy color */
+    color: #fff;
+  }
+  
+  .nav-links a {
+    margin-left: 2rem;
+    font-size: 1.2rem;
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .nav-links a:hover {
+    text-decoration: underline;
+  }
+  
+
+  .logo a {
+    font-size: 1.5rem;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  
+  .nav-links a:hover {
+    text-decoration: underline;
+  }
+  
