@@ -1,7 +1,10 @@
+
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
-    MONGO_CONNECTION_STRING: str = "mongodb+srv://tamehdave:Davejunior11@marketplacecluster.y49pm.mongodb.net/?retryWrites=true&w=majority&appName=MarketplaceCluster"
+    MONGO_CONNECTION_STRING: str = "mongodb+srv://tamehdave:Davejunior11@marketplacecluster.y49pm.mongodb.net/?retryWrites=true&appName=MarketplaceCluster&ssl=true"
+
     DATABASE_NAME: str = "vu_marketplace"
 
     class Config:
