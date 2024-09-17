@@ -1,8 +1,9 @@
 # app/main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.db.session import connect_to_mongo, close_mongo_connection
-from app.api.api_v1.api import api_router#Look at chat
+from db.session import connect_to_mongo, close_mongo_connection
+from api.api_v1.api import api_router#Look at chat
 
 
 @asynccontextmanager
@@ -13,8 +14,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Allow CORS for all origins (for development purposes)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to specific origins in production
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
 #End point regisration
-app.include_router(api_router)
+app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

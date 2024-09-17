@@ -1,11 +1,13 @@
-
+import os
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class Settings(BaseSettings):
-    MONGO_CONNECTION_STRING: str = "mongodb+srv://tamehdave:Davejunior11@marketplacecluster.y49pm.mongodb.net/?retryWrites=true&appName=MarketplaceCluster&ssl=true"
 
-    DATABASE_NAME: str = "vu_marketplace"
+    MONGO_CONNECTION_STRING: str = os.getenv("MONGO_CONNECTION_STRING")
+    DATABASE_NAME: str = os.getenv("DATABASE_NAME")
 
     class Config:
         env_file = None  # Disable .env file reading
