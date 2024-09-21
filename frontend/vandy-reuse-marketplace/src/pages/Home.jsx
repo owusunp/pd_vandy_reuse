@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import bookmarkIcon from '../assets/images/bookmark-icon.png';
+import notBookmarkedIcon from '../assets/images/notBookmark.png';
 
 const categories = ['All', 'Women', 'Men', 'Accessories', 'Electronics'];
 
@@ -76,6 +77,7 @@ const Home = ({ bookmarks, toggleBookmark }) => {
 
 const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % item.list_of_images.length);
@@ -85,9 +87,15 @@ const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + item.list_of_images.length) % item.list_of_images.length);
   };
 
+  const handleBookmarkClick = (item) => {
+    setIsBookmarked(toggleBookmark(item));
+    console.log(`Item ${item.id} is bookmarked: ${isBookmarked}`);
+  };
+  
+
   return (
     <div key={item.id} style={{ ...style, border: '1px solid #ccc', padding: '1rem', position: 'relative' }}>
-      <Link to={`/item/${item.id}`} style={{ textDecoration: 'none', color: '#000' }}>
+      <Link to={`/item-details/${item._id}`} style={{ textDecoration: 'none', color: '#000' }}>
         <img
           src={item.list_of_images[currentImageIndex]}
           alt={item.name}
@@ -115,9 +123,9 @@ const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
           border: 'none',
           cursor: 'pointer',
         }}
-        onClick={() => toggleBookmark(item)}
+        onClick={() => handleBookmarkClick(item)}
       >
-        <img
+        {isBookmarked && <img
           src={bookmarkIcon}
           alt="Bookmark"
           style={{
@@ -126,6 +134,17 @@ const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
             filter: bookmarks.includes(item) ? 'none' : 'grayscale(100%)',
           }}
         />
+        }
+        {!isBookmarked && <img
+          src={notBookmarkedIcon}
+          alt="Bookmark"
+          style={{
+            width: '24px',
+            height: '24px',
+            filter: bookmarks.includes(item) ? 'none' : 'grayscale(100%)',
+          }}
+        />
+        }
       </button>
     </div>
   );

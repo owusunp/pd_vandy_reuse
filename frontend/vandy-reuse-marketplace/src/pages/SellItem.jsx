@@ -132,7 +132,9 @@ const SellItem = () => {
 
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    if (images.length + selectedFiles.length > 3) {
+    if (selectedFiles.length < 1) {
+      setErrorMessage('You need to upload at least one image.');
+    } else if (images.length + selectedFiles.length > 3) {
       setErrorMessage('You can only upload a maximum of 3 images.');
     } else {
       setImages(prevImages => [...prevImages, ...selectedFiles]);
@@ -161,6 +163,11 @@ const SellItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Check if there is an error message
+   if (images.length < 1 || images.length > 3) {
+    alert("Please resolve the errors before submitting.");
+    return;
+  }
     const imageUrls = await uploadImages(images);
     const newItem = {
       name: itemName,
@@ -173,19 +180,18 @@ const SellItem = () => {
       category: "Miscellaneous",
     };
   
-    // Retrieve existing items from sessionStorage
-    const storedItems = sessionStorage.getItem('items');
-    let itemsArray = storedItems ? JSON.parse(storedItems) : [];
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/items/', newItem);
+      newItem._id = response;
+      // Retrieve existing items from sessionStorage
+      const storedItems = sessionStorage.getItem('items');
+      let itemsArray = storedItems ? JSON.parse(storedItems) : [];
   
     // Add the new item to the items array
-    itemsArray.push(newItem);
+      itemsArray.push(newItem);
   
     // Store the updated items array in sessionStorage
     sessionStorage.setItem('items', JSON.stringify(itemsArray));
-  
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/items/', newItem);
-      console.log('Item created successfully:', response.data);
       alert("Item posted successfully!");
     } catch (error) {
       console.error('Error creating item:', error.response ? error.response.data : error.message);
@@ -196,6 +202,7 @@ const SellItem = () => {
     setDescription('');
     setPrice('');
     setImages([]);
+    setErrorMessage('');
   };
 
   return (

@@ -36,6 +36,7 @@ const Layout = ({ children }) => {
         </Link>
         <NavLinks>
           <NavLink to="/">Home</NavLink>
+          <NavLink to="/notifications">Notifications</NavLink>
           <NavLink to="/messages">Messages</NavLink>
           <NavLink to="/sell-item">Sell Your Item</NavLink>
           <NavLink to="/bookmarks">View Bookmarks</NavLink>

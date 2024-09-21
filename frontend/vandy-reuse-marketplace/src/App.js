@@ -7,6 +7,8 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import SellItem from './pages/SellItem';
 import Messages from './pages/Messages';
+import ItemDetails from './pages/ItemDetails';
+import Notifications from './pages/Notifications';
 
 function App() {
   const [bookmarks, setBookmarks] = useState([]);
@@ -14,8 +16,10 @@ function App() {
   const toggleBookmark = (item) => {
     if (bookmarks.includes(item)) {
       setBookmarks(bookmarks.filter((bookmark) => bookmark !== item));
+      return false;
     } else {
       setBookmarks([...bookmarks, item]);
+      return true;
     }
   };
 
@@ -32,8 +36,10 @@ function App() {
             path="/bookmarks"
             element={<Bookmarks bookmarks={bookmarks} toggleBookmark={toggleBookmark} />}
           />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/item" element={<Dashboard />} />
+          <Route path="/item-details/:id" element={<ItemDetails />} />
           <Route path="/sell-item" element={<SellItem />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/messages" element={<Messages />} />
         </Routes>
       </Layout>
