@@ -30,6 +30,6 @@ async def create_item(item: Item):
     item_dict = item.dict()
     result = await collection.insert_one(item_dict)
     if result.inserted_id:
-        return {"message": "Item created successfully", "item_id": str(result.inserted_id)}
+        return str(result.inserted_id)
     else:
         raise HTTPException(status_code=500, detail="Item creation failed")
