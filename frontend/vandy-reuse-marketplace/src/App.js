@@ -10,23 +10,34 @@ import Messages from './pages/Messages';
 import ItemDetails from './pages/ItemDetails';
 import Notifications from './pages/Notifications';
 
-function App() {
-  const [bookmarks, setBookmarks] = useState([]);
+const App = () => {
+  const [bookmarks, setBookmarks] = useState(() => {
+    const [notificationCount, setNotificationCount] = useState(() => {
+    const savedCount = sessionStorage.getItem('notificationCount');
+    return savedCount ? parseInt(savedCount, 10) : 0;
+    });
+    // Load bookmarks from session storage if available
+    const savedBookmarks = sessionStorage.getItem('bookmarks');
+    return savedBookmarks ? JSON.parse(savedBookmarks) : [];
+  });
 
   const toggleBookmark = (item) => {
-    if (bookmarks.includes(item)) {
-      setBookmarks(bookmarks.filter((bookmark) => bookmark !== item));
-      return false;
+    const isBookmarked = bookmarks.some((bookmark) => bookmark._id === item._id);
+    let updatedBookmarks;
+    if (isBookmarked) {
+      updatedBookmarks = bookmarks.filter((bookmark) => bookmark._id !== item._id);
     } else {
-      setBookmarks([...bookmarks, item]);
-      return true;
+      updatedBookmarks = [...bookmarks, item];
     }
+    setBookmarks(updatedBookmarks);
+    sessionStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
   };
 
   return (
     <Router>
       <GlobalStyles />
       <Layout>
+        <NavBar notificationCount={notificationCount} />
         <Routes>
           <Route
             path="/"

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-import bookmarkIcon from '../assets/images/bookmark-icon.png';
-import notBookmarkedIcon from '../assets/images/notBookmark.png';
+import ItemComponent from '../components/ItemComponent'; // Adjust the import path as necessary
 
 const categories = ['All', 'Women', 'Men', 'Accessories', 'Electronics'];
 
@@ -11,21 +9,25 @@ const Home = ({ bookmarks, toggleBookmark }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    // Fetch items from the backend using axios
-    const fetchItems = async () => {
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/api/v1/items/');
-        setItems(response.data);
-        sessionStorage.setItem('items', JSON.stringify(response.data));
-      } catch (error) {
-        console.error('Error fetching items:', error.response ? error.response.data : error.message);
-      }
-    };
-  
     const storedItems = sessionStorage.getItem('items');
     if (storedItems) {
       setItems(JSON.parse(storedItems));
     } else {
+      // Fetch items from the backend using axios
+      const fetchItems = async () => {
+        try {
+          const response = await axios.get('http://127.0.0.1:8000/api/v1/items/');
+          const notifications = await axios.get('http://127.0.0.1:8000/api/v1/notifications/');
+          //notifications will be a dict with keys 'buy_notifications' and 'sell_notifications' that contain arrays of notifications.store the sum of the lengths of these arrays in a variable called notificationCount in sessionStorage
+          const notificationCount = notifications.data.buy_notifications.length + notifications.data.sell_notifications.length;
+          sessionStorage.setItem('notificationCount', notificationCount);
+          console.log("hello");
+          setItems(response.data);
+          sessionStorage.setItem('items', JSON.stringify(response.data));
+        } catch (error) {
+          console.error('Error fetching items:', error.response ? error.response.data : error.message);
+        }
+      };
       fetchItems();
     }
   }, []);
@@ -40,7 +42,6 @@ const Home = ({ bookmarks, toggleBookmark }) => {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '100vw'}}>
-      <h1>Reuse Vandy</h1>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         {categories.map((category) => (
           <button
@@ -63,7 +64,7 @@ const Home = ({ bookmarks, toggleBookmark }) => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
         {filteredItems.map((item) => (
           <ItemComponent
-            key={item.id}
+            key={item._id}
             item={item}
             bookmarks={bookmarks}
             toggleBookmark={toggleBookmark}
@@ -71,81 +72,6 @@ const Home = ({ bookmarks, toggleBookmark }) => {
           />
         ))}
       </div>
-    </div>
-  );
-};
-
-const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % item.list_of_images.length);
-  };
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + item.list_of_images.length) % item.list_of_images.length);
-  };
-
-  const handleBookmarkClick = (item) => {
-    setIsBookmarked(toggleBookmark(item));
-    console.log(`Item ${item.id} is bookmarked: ${isBookmarked}`);
-  };
-  
-
-  return (
-    <div key={item.id} style={{ ...style, border: '1px solid #ccc', padding: '1rem', position: 'relative' }}>
-      <Link to={`/item-details/${item._id}`} style={{ textDecoration: 'none', color: '#000' }}>
-        <img
-          src={item.list_of_images[currentImageIndex]}
-          alt={item.name}
-          style={{ width: '100%', height: '300px', width: '400px' }}
-        />
-        <h2>{item.name}</h2>
-        <p>{item.price}</p>
-      </Link>
-      {item.list_of_images.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'absolute', top: '50%', width: '100%' }}>
-          <button onClick={handlePrevImage} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
-            &lt;
-          </button>
-          <button onClick={handleNextImage} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
-            &gt;
-          </button>
-        </div>
-      )}
-      <button
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '5px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-        }}
-        onClick={() => handleBookmarkClick(item)}
-      >
-        {isBookmarked && <img
-          src={bookmarkIcon}
-          alt="Bookmark"
-          style={{
-            width: '24px',
-            height: '24px',
-            filter: bookmarks.includes(item) ? 'none' : 'grayscale(100%)',
-          }}
-        />
-        }
-        {!isBookmarked && <img
-          src={notBookmarkedIcon}
-          alt="Bookmark"
-          style={{
-            width: '24px',
-            height: '24px',
-            filter: bookmarks.includes(item) ? 'none' : 'grayscale(100%)',
-          }}
-        />
-        }
-      </button>
     </div>
   );
 };
