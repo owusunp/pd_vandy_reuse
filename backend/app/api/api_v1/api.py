@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.api_v1.endpoints import users, items, messages, upload
+from app.api.api_v1.endpoints import users, items, messages, upload, notifications
 
 api_router = APIRouter()
 
@@ -14,3 +14,6 @@ api_router.include_router(messages.router, prefix="/messages")
 
 # Include the upload-related routes 
 api_router.include_router(upload.router, prefix="/upload")
+
+# Include the notification-related routes
+api_router.include_router(notifications.router, prefix="/notifications")
