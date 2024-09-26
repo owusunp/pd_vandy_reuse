@@ -9,16 +9,18 @@ import SellItem from './pages/SellItem';
 import Messages from './pages/Messages';
 import ItemDetails from './pages/ItemDetails';
 import Notifications from './pages/Notifications';
+import { UnreadCountProvider } from './UnreadCountContext';
 
 const App = () => {
   const [bookmarks, setBookmarks] = useState(() => {
-    const [notificationCount, setNotificationCount] = useState(() => {
-    const savedCount = sessionStorage.getItem('notificationCount');
-    return savedCount ? parseInt(savedCount, 10) : 0;
-    });
     // Load bookmarks from session storage if available
     const savedBookmarks = sessionStorage.getItem('bookmarks');
     return savedBookmarks ? JSON.parse(savedBookmarks) : [];
+  });
+
+  const [notificationCount, setNotificationCount] = useState(() => {
+    const savedCount = sessionStorage.getItem('notificationCount');
+    return savedCount ? parseInt(savedCount, 10) : 0;
   });
 
   const toggleBookmark = (item) => {
@@ -36,8 +38,8 @@ const App = () => {
   return (
     <Router>
       <GlobalStyles />
-      <Layout>
-        <NavBar notificationCount={notificationCount} />
+      <UnreadCountProvider>
+      <Layout notificationCount={notificationCount}>
         <Routes>
           <Route
             path="/"
@@ -54,6 +56,7 @@ const App = () => {
           <Route path="/messages" element={<Messages />} />
         </Routes>
       </Layout>
+      </UnreadCountProvider>
     </Router>
   );
 }

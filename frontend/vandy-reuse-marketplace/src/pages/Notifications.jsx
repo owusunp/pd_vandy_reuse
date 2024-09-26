@@ -18,7 +18,6 @@ const Notifications = () => {
           //console log both buying and selling notifications
           console.log(response.data.buy_notifications);
           console.log(response.data.sell_notifications);
-          alert('Notifications fetched successfully');
         }
       } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -31,9 +30,8 @@ const Notifications = () => {
 
   useEffect(() => {
     // Update unread count
-    const count = [...sellingNotifications, ...buyingNotifications].filter(notification => !notification.isRead).length;
+    const count = [...sellingNotifications, ...buyingNotifications].filter(notification => !notification.is_read).length;
     setUnreadCount(count);
-    sessionStorage.setItem('notificationCount', count.toString());
   }, [sellingNotifications, buyingNotifications, setUnreadCount]);
 
   const notificationsToDisplay = (filter === 'Buying' ? buyingNotifications : sellingNotifications)

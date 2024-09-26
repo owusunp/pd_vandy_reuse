@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import bookmarkIcon from '../assets/images/bookmark-icon.png';
 import notBookmarkedIcon from '../assets/images/notBookmark.png';
+import { useLocation } from 'react-router-dom';
 
 const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const location = useLocation();
   let isBookmarked = bookmarks.some((bookmark) => bookmark._id === item._id);
 
   const handleNextImage = () => {
@@ -25,12 +27,12 @@ const ItemComponent = ({ item, bookmarks, toggleBookmark, style }) => {
         <img
           src={item.list_of_images[currentImageIndex]}
           alt={item.name}
-          style={{ width: '100%', height: '300px', width: '400px' }}
+          style={{ width: '100%', height: '200px', width: '280px' }}
         />
         <h2>{item.name}</h2>
         <p>{item.price}</p>
       </Link>
-      {item.list_of_images.length > 1 && (
+      {item.list_of_images.length > 1 && location.pathname.includes('/item-details') && (
         <div style={{ display: 'flex', justifyContent: 'space-between', position: 'absolute', top: '50%', width: '100%' }}>
           <button onClick={handlePrevImage} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
             &lt;

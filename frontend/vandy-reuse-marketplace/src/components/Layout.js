@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { useUnreadCount } from '../UnreadCountContext';
 
 const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0D324D; /* Vanderbilt dark blue */
+  background-color: black; /* Vanderbilt dark blue */
   padding: 1rem 2rem;
 `;
 
@@ -41,35 +42,7 @@ const NotificationBadge = styled.span`
 `;
 
 const Layout = ({ children }) => {
-  const [notificationCount, setNotificationCount] = useState(0);
-
-  const updateNotificationCount = () => {
-    const count = sessionStorage.getItem('notificationCount');
-    if (count) {
-      setNotificationCount(parseInt(count, 10));
-    } else {
-      setNotificationCount(0);
-    }
-  };
-
-  useEffect(() => {
-    // Initial load
-    updateNotificationCount();
-
-    // Event listener for storage changes
-    const handleStorageChange = (event) => {
-      if (event.key === 'notificationCount') {
-        updateNotificationCount();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  const { unreadCount } = useUnreadCount();
 
   return (
     <>
@@ -81,8 +54,8 @@ const Layout = ({ children }) => {
           <StyledNavLink to="/" exact>Home</StyledNavLink>
           <StyledNavLink to="/notifications" style={{ position: 'relative' }}>
             Notifications
-            {notificationCount > 0 && (
-              <NotificationBadge>{notificationCount}</NotificationBadge>
+            {unreadCount > 0 && (
+              <NotificationBadge>{unreadCount}</NotificationBadge>
             )}
           </StyledNavLink>
           <StyledNavLink to="/messages">Messages</StyledNavLink>
