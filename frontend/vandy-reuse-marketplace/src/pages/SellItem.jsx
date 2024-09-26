@@ -164,10 +164,10 @@ const SellItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Check if there is an error message
-   if (images.length < 1 || images.length > 3) {
-    alert("Please resolve the errors before submitting.");
-    return;
-  }
+    if (images.length < 1 || images.length > 3) {
+      alert("Please resolve the errors before submitting.");
+      return;
+    }
     const imageUrls = await uploadImages(images);
     const newItem = {
       name: itemName,
@@ -182,16 +182,27 @@ const SellItem = () => {
   
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/v1/items/', newItem);
-      newItem._id = response;
+      newItem._id = response.data; // Assuming the response contains the new item's ID
+  
+      // Create a notification
+      const newNotification = {
+        poster: userName,
+        description: `New item posted: ${itemName}`,
+        date_posted: new Date().toISOString(),
+        is_read: false,
+      };
+  
+      await axios.post('http://127.0.0.1:8000/api/v1/notifications/sell_notification', newNotification);
+  
       // Retrieve existing items from sessionStorage
       const storedItems = sessionStorage.getItem('items');
       let itemsArray = storedItems ? JSON.parse(storedItems) : [];
   
-    // Add the new item to the items array
+      // Add the new item to the items array
       itemsArray.push(newItem);
   
-    // Store the updated items array in sessionStorage
-    sessionStorage.setItem('items', JSON.stringify(itemsArray));
+      // Store the updated items array in sessionStorage
+      sessionStorage.setItem('items', JSON.stringify(itemsArray));
       alert("Item posted successfully!");
     } catch (error) {
       console.error('Error creating item:', error.response ? error.response.data : error.message);
