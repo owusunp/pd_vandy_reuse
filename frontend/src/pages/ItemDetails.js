@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { StreamChat } from 'stream-chat';
+import { useItems } from '../ItemsContext';
 
 const apiKey = 'wh9yrcrxaqss'; // Stream API Key
 
@@ -8,8 +9,7 @@ const ItemDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const storedItems = sessionStorage.getItem('items');
-  const items = storedItems ? JSON.parse(storedItems) : [];
+  const {items} = useItems();
   const item = items.find(item => item._id === id);
 
   const handleNextImage = () => {
