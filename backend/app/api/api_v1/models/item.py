@@ -11,4 +11,4 @@ class Item(BaseModel):
     list_of_images: List[str]
     date_posted: str
     sold: bool
-    category: str
+    category: List[str]
