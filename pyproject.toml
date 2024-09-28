@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pd-vandy-reuse"
+version = "0.1.0"
+description = ""
+authors = ["owusunp <135676299+owusunp@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = "^0.30.6"
+motor = "^3.6.0"
+python-dotenv = "^1.0.1"
+stream-python = "^5.3.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
