@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useItems } from '../ItemsContext'; // Import the context
+import { CATEGORIES } from '../data/categories';
 
 const SellItemContainer = styled.div`
   display: flex;
@@ -163,6 +164,29 @@ const SellItem = () => {
     }
   };
 
+const findCategories = (name, description) => {
+  // Combine item name and description into a single string to search for keywords
+  const combinedText = `${name.toLowerCase()} ${description.toLowerCase()}`;
+
+  // Initialize an array to store matching categories
+  const matchedCategories = [];
+
+  // Loop through the CATEGORIES to find all matches
+  for (const [category, keywords] of Object.entries(CATEGORIES)) {
+    for (const keyword of keywords) {
+      if (combinedText.includes(keyword.toLowerCase())) {
+        // If the category hasn't been added yet, push it to the list
+        if (!matchedCategories.includes(category)) {
+          matchedCategories.push(category);
+        }
+      }
+    }
+  }
+
+  // Return the list of matched categories, or "Miscellaneous" if none are found
+  return matchedCategories.length > 0 ? matchedCategories : ["Miscellaneous"];
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (images.length < 1 || images.length > 3) {
@@ -179,7 +203,7 @@ const SellItem = () => {
       list_of_images: imageUrls,
       date_posted: new Date().toISOString().split('T')[0],
       sold: false,
-      category: "Miscellaneous",
+      category: findCategories(itemName, description),
     };
 
     try {

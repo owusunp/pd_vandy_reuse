@@ -1,7 +1,10 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUnreadCount } from '../UnreadCountContext';
+import searchIcon from '../assets/images/search.jpeg'; // Import search icon
+import { CATEGORIES } from '../data/categories'; // Import your CATEGORIES
+import axios from 'axios';
 
 const Navbar = styled.nav`
   display: flex;
@@ -22,7 +25,7 @@ const StyledNavLink = styled(NavLink)`
   font-weight: bold;
 
   &.active {
-   text-decoration: underline;
+    text-decoration: underline;
   }
 
   &:hover {
@@ -52,8 +55,155 @@ const LogoutButton = styled.button`
   }
 `;
 
-const Layout = ({ children, isLoggedIn, onLogout }) => {
+const SearchContainer = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 400px;
+  height: 40px;
+`;
+
+const SearchBar = styled.input`
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+  height: 30px; /* Set the height to match the button */
+  box-sizing: border-box;
+  position:relative;
+  left:8px;
+  font-family: sans-serif;
+
+  &:focus {
+    border-color: #B3A369; /* Vanderbilt color */
+  }
+`;
+
+const SearchButton = styled.button`
+  background: url(${searchIcon}) no-repeat center;
+  background-size: 20px 20px;
+  padding: 10px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 45px; /* Set height to match the search bar */
+  box-sizing: border-box;
+  outline: none;
+  position:relative;
+  left: -23px;
+`;
+
+const SuggestionsBox = styled.div`
+  position: absolute;
+  top: 50px;
+  left: 8px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 360px;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+`;
+
+const SuggestionRow = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f9f9f9;
+  }
+`;
+
+const SuggestionImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+`;
+
+const SuggestionText = styled.span`
+  font-size: 1rem;
+  color: #333;
+`;
+
+const Layout = ({ children, isLoggedIn, onLogout, onSearch }) => {
   const { unreadCount } = useUnreadCount();
+  const [searchInput, setSearchInput] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const navigate = useNavigate();
+  const suggestionsBoxRef = useRef(null);
+
+  const fetchItems = async () => {
+    try {
+      if (sessionStorage.getItem('items')) {
+        return JSON.parse(sessionStorage.getItem('items'));
+      }
+      const response = await axios.get('http://127.0.0.1:8000/api/v1/items/');
+      sessionStorage.setItem('items', JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching items:', error);
+      return [];
+    }
+  };
+
+  const performSearch = async (searchTerm) => {
+    if (searchTerm.trim() === '') {
+      setSuggestions([]);
+      onSearch(''); // Clear the search in Home
+      return;
+    }
+
+    const items = await fetchItems();
+    const pattern = new RegExp(searchTerm, 'gi');
+    let filteredItems = items.filter((item) => pattern.test(item.name));
+
+    // If no name match, search categories
+    if (filteredItems.length === 0) {
+      for (const category of Object.keys(CATEGORIES)) {
+        if (pattern.test(category)) {
+          filteredItems = items.filter((item) => item.category.includes(category));
+          break;
+        }
+      }
+    }
+
+    setSuggestions(filteredItems);
+  };
+
+  const handleSuggestionClick = (id) => {
+    setSuggestions([]); // Clear suggestions after selecting
+    navigate(`/item-details/${id}`); // Navigate to item-details page
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value); // Search happens automatically because of useEffect
+    performSearch(e.target.value); // Search as you type
+  };
+
+  const handleSearchButtonClick = () => {
+    performSearch(searchInput); // Manually trigger search when search button is clicked
+  };
+
+  const handleClickOutside = (event) => {
+    if (suggestionsBoxRef.current && !suggestionsBoxRef.current.contains(event.target)) {
+      setSuggestions([]); // Hide suggestions when clicking outside
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -61,6 +211,27 @@ const Layout = ({ children, isLoggedIn, onLogout }) => {
         <NavLink to="/" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 'bold' }}>
           Reuse Vandy
         </NavLink>
+
+        <SearchContainer>
+          <SearchBar
+            type="text"
+            placeholder="Search..."
+            value={searchInput}
+            onChange={handleSearchInputChange}
+          />
+          <SearchButton onClick={handleSearchButtonClick} />
+          {suggestions.length > 0 && (
+            <SuggestionsBox ref={suggestionsBoxRef}>
+              {suggestions.map((item) => (
+                <SuggestionRow key={item._id} onClick={() => handleSuggestionClick(item._id)}>
+                  <SuggestionImage src={item.list_of_images[0]} alt={item.name} />
+                  <SuggestionText>{item.name}</SuggestionText>
+                </SuggestionRow>
+              ))}
+            </SuggestionsBox>
+          )}
+        </SearchContainer>
+
         <NavLinks>
           <StyledNavLink to="/" exact="true">Home</StyledNavLink>
           <StyledNavLink to="/notifications" style={{ position: 'relative' }}>

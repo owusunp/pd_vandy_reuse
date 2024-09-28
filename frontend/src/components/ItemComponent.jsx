@@ -26,7 +26,7 @@ const ItemComponent = ({ item, bookmarks = [], toggleBookmark, style }) => {
         <img
           src={item.list_of_images[currentImageIndex]}
           alt={item.name}
-          style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+          style={{ height: '220px', width: '300px' }}
         />
         <h2>{item.name}</h2>
         <p>{item.price}</p>
@@ -56,15 +56,11 @@ const ItemComponent = ({ item, bookmarks = [], toggleBookmark, style }) => {
           src={isBookmarked ? bookmarkIcon : notBookmarkedIcon}
           alt="Bookmark"
           style={{
-            width: '24px',
-            height: '24px',
+            width: '20px',
+            height: '20px',
           }}
         />
       </button>
-      {/* Added the following section for messaging */}
-      <Link to={`/messages?to=${item.vendor}`} style={{ position: 'absolute', bottom: '10px', left: '5px', color: '#007bff' }}>
-        Contact Seller
-      </Link>
     </div>
   );
 };

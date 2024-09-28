@@ -13,7 +13,7 @@ const Bookmarks = ({ bookmarks, toggleBookmark }) => {
               item={item}
               bookmarks={bookmarks}
               toggleBookmark={toggleBookmark}
-              style={{ height: '400px', width: '420px', overflow: 'hidden' }} 
+              style={{ height: '300px', width: '320px', overflow: 'hidden' }} 
             />
           )
         ))}
