@@ -17,7 +17,7 @@ const SellItemContainer = styled.div`
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #B3A369;
+  color: #333;
   margin-bottom: 1.5rem;
   text-align: center;
 `;
@@ -83,7 +83,7 @@ const TextArea = styled.textarea`
 const SubmitButton = styled.button`
   padding: 1rem;
   font-size: 1.25rem;
-  background-color: #B3A369;
+  background-color: #333;
   color: white;
   border: none;
   border-radius: 5px;

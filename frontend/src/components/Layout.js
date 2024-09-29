@@ -429,11 +429,6 @@ const Layout = ({
               <NotificationBadge>{bookmarks.length}</NotificationBadge>
             )}
           </StyledNavLink>
-          {isLoggedIn ? (
-            <LogoutButton onClick={onLogout}>Logout</LogoutButton>
-          ) : (
-            <StyledNavLink to="/login">Login</StyledNavLink>
-          )}
         </NavLinks>
       </Navbar>
 

@@ -23,7 +23,7 @@ const Home = ({ bookmarks, toggleBookmark }) => {
   const sortedItems = filteredItems.sort((a, b) => (a.status === 'sold' ? 1 : -1));
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '100vw' }}>
+    <div style={{ padding: '2rem', maxWidth: '100vw', marginTop: "70px" }}>
       {/* Category Buttons */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         {categories.map((category) => (
