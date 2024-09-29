@@ -1,17 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useUnreadCount } from '../UnreadCountContext';
-import searchIcon from '../assets/images/search.jpeg'; // Import search icon
-import cartIcon from '../assets/images/cart.png'; // Import cart icon
-import { CATEGORIES } from '../data/categories'; // Import your CATEGORIES
+import searchIcon from '../assets/images/search.jpeg';
+import randomLogo from '../assets/images/random-logo.png';
+import allIcon from '../assets/images/all-icon.png';
+import { CATEGORIES } from '../data/categories';
 import axios from 'axios';
+import { useUnreadCount } from '../UnreadCountContext';
+import cartIcon from '../assets/images/cart.png'; // Import cart icon
+import { StreamChat } from 'stream-chat';
 
+// Styled Components
 const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: black; /* Vanderbilt dark blue */
+  background-color: black;
   padding: 1rem 2rem;
   position: fixed;
   top: 0;
@@ -55,6 +59,11 @@ const NotificationBadge = styled.span`
   font-size: 12px;
 `;
 
+const NavLinks = styled.div`
+  display: flex;
+  gap: 1.5rem;
+`;
+
 const LogoutButton = styled.button`
   background-color: transparent;
   border: none;
@@ -66,6 +75,206 @@ const LogoutButton = styled.button`
   }
   position: relative;
   top: -9px;
+`;
+
+const StyledNavLink = styled(NavLink)`
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: bold;
+
+  &.active {
+    text-decoration: underline;
+  }
+
+  &:hover {
+    color: #ECEFF1;
+  }
+`;
+
+const NavLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const Logo = styled.img`
+  height: 40px;
+  cursor: pointer;
+`;
+
+const AllButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  &:hover {
+    color: #eceff1;
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const AllDropdown = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 300px;
+  background-color: white;
+  color: black;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transform: ${(props) => (props.open ? 'translateX(0)' : 'translateX(-100%)')};
+  transition: transform 0.3s ease-in-out;
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: ${(props) => (props.open ? 'block' : 'none')};
+`;
+
+const DropdownHeader = styled.div`
+  background-color: black;
+  color: white;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+`;
+
+const DropdownItem = styled.div`
+  padding: 16px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f1f1f1;
+  }
+  font-size: 16px;
+  color: black;
+  border-bottom: 1px solid #ddd;
+`;
+
+const StyledNavLink = styled(NavLink)`
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: bold;
+
+  &.active {
+    text-decoration: underline;
+  }
+
+  &:hover {
+    color: #ECEFF1;
+  }
+`;
+
+const NavLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const Logo = styled.img`
+  height: 40px;
+  cursor: pointer;
+`;
+
+const AllButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  &:hover {
+    color: #eceff1;
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const AllDropdown = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 300px;
+  background-color: white;
+  color: black;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transform: ${(props) => (props.open ? 'translateX(0)' : 'translateX(-100%)')};
+  transition: transform 0.3s ease-in-out;
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: ${(props) => (props.open ? 'block' : 'none')};
+`;
+
+const DropdownHeader = styled.div`
+  background-color: black;
+  color: white;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+`;
+
+const DropdownItem = styled.div`
+  padding: 16px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f1f1f1;
+  }
+  font-size: 16px;
+  color: black;
+  border-bottom: 1px solid #ddd;
 `;
 
 const SearchContainer = styled.div`
@@ -83,14 +292,14 @@ const SearchBar = styled.input`
   font-size: 1rem;
   outline: none;
   width: 100%;
-  height: 30px; /* Set the height to match the button */
+  height: 30px;
   box-sizing: border-box;
   position:relative;
   left:8px;
   font-family: sans-serif;
 
   &:focus {
-    border-color: #B3A369; /* Vanderbilt color */
+    border-color: #B3A369;
   }
 `;
 
@@ -102,11 +311,17 @@ const SearchButton = styled.button`
   border: none;
   cursor: pointer;
   width: 40px;
-  height: 45px; /* Set height to match the search bar */
+  height: 45px;
   box-sizing: border-box;
   outline: none;
   position:relative;
   left: -23px;
+`;
+
+const NavRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 `;
 
 const SuggestionsBox = styled.div`
@@ -154,14 +369,26 @@ const CartIcon = styled.img`
   top: -9px;
 `;
 
-const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
+const Layout = ({ children, isLoggedIn, onLogout, bookmarks = () => {} }) => {
   const { unreadCount } = useUnreadCount();
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [navbarVisible, setNavbarVisible] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const suggestionsBoxRef = useRef(null);
   const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('streamToken');
+    const usernameFromSession = sessionStorage.getItem('username');
+
+    if (token && usernameFromSession) {
+      const chatClient = StreamChat.getInstance('wh9yrcrxaqss');
+      setUsername(usernameFromSession); // Set username from session storage
+    }
+  }, []);
 
   const fetchItems = async () => {
     try {
@@ -187,7 +414,6 @@ const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
     const pattern = new RegExp(searchTerm, 'gi');
     let filteredItems = items.filter((item) => pattern.test(item.name));
 
-    // If no name match, search categories
     if (filteredItems.length === 0) {
       for (const category of Object.keys(CATEGORIES)) {
         if (pattern.test(category)) {
@@ -201,23 +427,31 @@ const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
   };
 
   const handleSuggestionClick = (id) => {
-    setSuggestions([]); // Clear suggestions after selecting
-    navigate(`/item-details/${id}`); // Navigate to item-details page
+    setSuggestions([]);
+    navigate(`/item-details/${id}`);
   };
 
   const handleSearchInputChange = (e) => {
-    setSearchInput(e.target.value); // Search happens automatically because of useEffect
-    performSearch(e.target.value); // Search as you type
+    setSearchInput(e.target.value);
+    performSearch(e.target.value);
   };
 
   const handleSearchButtonClick = () => {
-    performSearch(searchInput); // Manually trigger search when search button is clicked
+    performSearch(searchInput);
   };
 
   const handleClickOutside = (event) => {
     if (suggestionsBoxRef.current && !suggestionsBoxRef.current.contains(event.target)) {
-      setSuggestions([]); // Hide suggestions when clicking outside
+      setSuggestions([]); 
     }
+  };
+
+  const handleDropdownToggle = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const closeDropdown = () => {
+    setDropdownOpen(false);
   };
 
   const handleScroll = () => {
@@ -241,9 +475,12 @@ const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
   return (
     <>
       <Navbar visible={navbarVisible}>
-        <NavLink to="/" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 'bold' }}>
-          Reuse Vandy
-        </NavLink>
+        <NavLeft>
+          <Logo src={randomLogo} alt="Logo" onClick={() => navigate('/')} />
+          <AllButton onClick={handleDropdownToggle}>
+            <img src={allIcon} alt="All" /> All
+          </AllButton>
+        </NavLeft>
 
         <SearchContainer>
           <SearchBar
@@ -266,7 +503,6 @@ const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
         </SearchContainer>
 
         <NavLinks>
-          <StyledNavLink to="/" exact="true">Home</StyledNavLink>
           <StyledNavLink to="/notifications" style={{ position: 'relative' }}>
             Notifications
             {unreadCount > 0 && (
@@ -288,6 +524,18 @@ const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
           )}
         </NavLinks>
       </Navbar>
+
+      <Overlay open={dropdownOpen} onClick={closeDropdown} />
+
+      <AllDropdown open={dropdownOpen}>
+        <DropdownHeader>
+          Hello, {username}
+          <CloseButton onClick={closeDropdown}>&times;</CloseButton>
+        </DropdownHeader>
+        <DropdownItem onClick={() => navigate('/change-profile')}>Change Profile</DropdownItem>
+        <DropdownItem onClick={onLogout}>Logout</DropdownItem>
+      </AllDropdown>
+
       <main>{children}</main>
     </>
   );

@@ -10,6 +10,8 @@ import {
   Window,
   Thread,
   ChannelList,
+  Avatar, // Import Avatar component
+  TypingIndicator, // Typing indicator feature
 } from 'stream-chat-react';
 import '../../node_modules/stream-chat-react/dist/css/v2/index.css'; // Stream pre-built CSS
 
@@ -18,15 +20,15 @@ const apiKey = 'wh9yrcrxaqss';
 const Messages = () => {
   const [client, setClient] = useState(null);
   const [activeChannel, setActiveChannel] = useState(null);
-  const [otherUserName, setOtherUserName] = useState(''); // Store the username of the person you're texting
+  const [otherUserName, setOtherUserName] = useState('');
   const chatClientRef = useRef(null);
-  const location = useLocation(); // To access query params
+  const location = useLocation();
 
   useEffect(() => {
     const token = sessionStorage.getItem('streamToken');
     const username = sessionStorage.getItem('username');
     const query = new URLSearchParams(location.search);
-    const seller = query.get('to');  // Get the seller from the URL
+    const seller = query.get('to');
 
     if (!username || !token) {
       console.error('Username or token is missing');
@@ -42,12 +44,11 @@ const Messages = () => {
             token
           );
 
-          chatClientRef.current = chatClient; // Persist the chat client instance
+          chatClientRef.current = chatClient;
           setClient(chatClient);
         }
 
         if (seller) {
-          // Create or fetch the channel between buyer and seller
           const channel = chatClientRef.current.channel('messaging', {
             members: [username, seller],
           });
@@ -55,7 +56,7 @@ const Messages = () => {
           await channel.watch();
 
           setActiveChannel(channel);
-          setOtherUserName(seller); // Set the seller's username as the conversation partner
+          setOtherUserName(seller);
         }
       } catch (error) {
         console.error('Error connecting to chat service:', error);
@@ -69,18 +70,17 @@ const Messages = () => {
         chatClientRef.current.disconnectUser();
       }
     };
-  }, [location.search]); // Re-run when location.search (URL query params) changes
+  }, [location.search]);
 
   const handleChannelSelect = (channel) => {
     setActiveChannel(channel);
 
-    // Get the other member's username (the person you're texting)
     const members = Object.values(channel.state.members);
     const otherMember = members.find(
       (member) => member.user.id !== sessionStorage.getItem('username')
     );
     if (otherMember) {
-      setOtherUserName(otherMember.user.name || otherMember.user.id); // Display either name or ID if the name is missing
+      setOtherUserName(otherMember.user.name || otherMember.user.id);
     }
   };
 
@@ -104,26 +104,52 @@ const Messages = () => {
               const otherMember = members.find(
                 (member) => member.user.id !== sessionStorage.getItem('username')
               );
-              const displayName = otherMember?.user?.name || otherMember?.user?.id || 'user'; // Use name or ID or fallback to 'user'
+              const displayName =
+                otherMember?.user?.name || otherMember?.user?.id || 'user';
+              const unreadCount = props.channel.countUnread();
+
+              // Get the last message and determine its type
+              const lastMessageIndex = props.channel.state.messages.length - 1;
+              const lastMessageObj =
+                lastMessageIndex >= 0
+                  ? props.channel.state.messages[lastMessageIndex]
+                  : null;
+              let lastMessagePreview = 'Start a conversation'; // Default message if no messages exist
+
+              if (lastMessageObj) {
+                if (lastMessageObj.attachments && lastMessageObj.attachments.length > 0) {
+                  // If the last message has attachments (e.g., an image), show "Sent a photo"
+                  lastMessagePreview = 'Sent a photo';
+                } else if (lastMessageObj.text) {
+                  // Otherwise, show the text of the message
+                  lastMessagePreview = lastMessageObj.text;
+                }
+              }
+
               return (
                 <div
                   onClick={() => handleChannelSelect(props.channel)}
                   style={styles.channelPreview}
                 >
-                  <img
-                    src={
-                      props.channel.state.messages[0]?.user?.image ||
-                      '/path/to/default-avatar.png'
-                    }
-                    alt={displayName}
-                    style={styles.avatar}
+                  <Avatar
+                    name={displayName}
+                    size={40}
+                    userId={otherMember?.user?.id}
+                    presenceIndicator
                   />
                   <div style={styles.channelInfo}>
-                    <div style={styles.channelName}>
+                    <div
+                      style={{
+                        fontWeight: unreadCount > 0 ? 'bold' : 'normal',
+                      }}
+                    >
                       {displayName}
+                      {unreadCount > 0 && (
+                        <span style={styles.unreadBadge}>{unreadCount}</span>
+                      )}
                     </div>
                     <div style={styles.lastMessage}>
-                      {props.channel.state.messages[0]?.text || 'No messages yet'}
+                      {lastMessagePreview}
                     </div>
                   </div>
                 </div>
@@ -137,13 +163,22 @@ const Messages = () => {
           {activeChannel ? (
             <Channel channel={activeChannel}>
               <Window>
-                {/* Display the other user's name here */}
                 <div style={styles.headerContainer}>
                   <h2 style={styles.usernameDisplay}>{otherUserName}</h2>
                 </div>
                 <ChannelHeader />
-                <MessageList />
-                <MessageInput />
+                <MessageList
+                  messageActions={['react', 'reply', 'edit', 'delete', 'pin']}
+                  reactionsEnabled
+                  showReadStatus
+                  typingIndicator={<TypingIndicator channel={activeChannel} />}
+                />
+                <MessageInput
+                  mentionAutocomplete
+                  reactionsEnabled
+                  attachmentsEnabled
+                  giphyEnabled
+                />
               </Window>
               <Thread />
             </Channel>
@@ -191,11 +226,16 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
-  channelName: {
-    fontWeight: 'bold',
-  },
   lastMessage: {
     color: '#888',
+  },
+  unreadBadge: {
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: '50%',
+    padding: '2px 8px',
+    marginLeft: '8px',
+    fontSize: '0.8rem',
   },
   placeholder: {
     display: 'flex',
