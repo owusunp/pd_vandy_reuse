@@ -7,6 +7,7 @@ import allIcon from '../assets/images/all-icon.png';
 import { CATEGORIES } from '../data/categories';
 import axios from 'axios';
 import { useUnreadCount } from '../UnreadCountContext';
+import cartIcon from '../assets/images/cart.png';
 import { StreamChat } from 'stream-chat';
 
 // Styled Components
@@ -16,23 +17,32 @@ const Navbar = styled.nav`
   align-items: center;
   background-color: black;
   padding: 1rem 2rem;
-  color: white;
-`;
-
-const NotificationBadge = styled.span`
-  position: absolute;
-  top: -14px;
-  right: -10px;
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 4px 10px;
-  font-size: 12px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  max-width: 100vw;
+  z-index: 1000;
+  transform: translateY(${(props) => (props.visible ? '0' : '-100%')});
+  transition: transform 0.3s ease-in-out;
 `;
 
 const NavLinks = styled.div`
   display: flex;
   gap: 1.5rem;
+  position: relative;
+  left: -40px;
+  top: 8px;
+`;
+
+const NotificationBadge = styled.span`
+  position: absolute;
+  top: -14px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 4px 8px;
+  font-size: 12px;
 `;
 
 const LogoutButton = styled.button`
@@ -42,12 +52,14 @@ const LogoutButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   &:hover {
-    color: #ECEFF1;
+    color: #eceff1;
   }
+  position: relative;
+  top: -9px;
 `;
 
 const StyledNavLink = styled(NavLink)`
-  color: #FFFFFF;
+  color: #ffffff;
   text-decoration: none;
   font-weight: bold;
 
@@ -56,7 +68,7 @@ const StyledNavLink = styled(NavLink)`
   }
 
   &:hover {
-    color: #ECEFF1;
+    color: #eceff1;
   }
 `;
 
@@ -101,7 +113,8 @@ const AllDropdown = styled.div`
   color: black;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  transform: ${(props) => (props.open ? 'translateX(0)' : 'translateX(-100%)')};
+  transform: ${(props) =>
+    props.open ? 'translateX(0)' : 'translateX(-100%)'};
   transition: transform 0.3s ease-in-out;
 `;
 
@@ -163,12 +176,12 @@ const SearchBar = styled.input`
   width: 100%;
   height: 30px;
   box-sizing: border-box;
-  position:relative;
-  left:8px;
+  position: relative;
+  left: 8px;
   font-family: sans-serif;
 
   &:focus {
-    border-color: #B3A369;
+    border-color: #b3a369;
   }
 `;
 
@@ -183,7 +196,7 @@ const SearchButton = styled.button`
   height: 45px;
   box-sizing: border-box;
   outline: none;
-  position:relative;
+  position: relative;
   left: -23px;
 `;
 
@@ -230,14 +243,29 @@ const SuggestionText = styled.span`
   color: #333;
 `;
 
-const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
+const CartIcon = styled.img`
+  width: 40px;
+  height: 30px;
+  margin-right: 5px;
+  position: relative;
+  top: -9px;
+`;
+
+const Layout = ({
+  children,
+  isLoggedIn,
+  onLogout,
+  bookmarks = [],
+}) => {
   const { unreadCount } = useUnreadCount();
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const [navbarVisible, setNavbarVisible] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const suggestionsBoxRef = useRef(null);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const token = sessionStorage.getItem('streamToken');
@@ -245,7 +273,7 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
 
     if (token && usernameFromSession) {
       const chatClient = StreamChat.getInstance('wh9yrcrxaqss');
-      setUsername(usernameFromSession); // Set username from session storage
+      setUsername(usernameFromSession);
     }
   }, []);
 
@@ -254,7 +282,9 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
       if (sessionStorage.getItem('items')) {
         return JSON.parse(sessionStorage.getItem('items'));
       }
-      const response = await axios.get('http://127.0.0.1:8000/api/v1/items/');
+      const response = await axios.get(
+        'http://127.0.0.1:8000/api/v1/items/'
+      );
       sessionStorage.setItem('items', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
@@ -266,18 +296,21 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
   const performSearch = async (searchTerm) => {
     if (searchTerm.trim() === '') {
       setSuggestions([]);
-      onSearch(''); // Clear the search in Home
       return;
     }
 
     const items = await fetchItems();
     const pattern = new RegExp(searchTerm, 'gi');
-    let filteredItems = items.filter((item) => pattern.test(item.name));
+    let filteredItems = items.filter((item) =>
+      pattern.test(item.name)
+    );
 
     if (filteredItems.length === 0) {
       for (const category of Object.keys(CATEGORIES)) {
         if (pattern.test(category)) {
-          filteredItems = items.filter((item) => item.category.includes(category));
+          filteredItems = items.filter((item) =>
+            item.category.includes(category)
+          );
           break;
         }
       }
@@ -301,7 +334,10 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
   };
 
   const handleClickOutside = (event) => {
-    if (suggestionsBoxRef.current && !suggestionsBoxRef.current.contains(event.target)) {
+    if (
+      suggestionsBoxRef.current &&
+      !suggestionsBoxRef.current.contains(event.target)
+    ) {
       setSuggestions([]);
     }
   };
@@ -314,18 +350,33 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
     setDropdownOpen(false);
   };
 
+  const handleScroll = () => {
+    if (window.scrollY < lastScrollY.current) {
+      setNavbarVisible(true);
+    } else {
+      setNavbarVisible(false);
+    }
+    lastScrollY.current = window.scrollY;
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   return (
     <>
-      <Navbar>
+      <Navbar visible={navbarVisible}>
         <NavLeft>
-          <Logo src={randomLogo} alt="Logo" onClick={() => navigate('/')} />
+          <Logo
+            src={randomLogo}
+            alt="Logo"
+            onClick={() => navigate('/')}
+          />
           <AllButton onClick={handleDropdownToggle}>
             <img src={allIcon} alt="All" /> All
           </AllButton>
@@ -342,8 +393,14 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
           {suggestions.length > 0 && (
             <SuggestionsBox ref={suggestionsBoxRef}>
               {suggestions.map((item) => (
-                <SuggestionRow key={item._id} onClick={() => handleSuggestionClick(item._id)}>
-                  <SuggestionImage src={item.list_of_images[0]} alt={item.name} />
+                <SuggestionRow
+                  key={item._id}
+                  onClick={() => handleSuggestionClick(item._id)}
+                >
+                  <SuggestionImage
+                    src={item.list_of_images[0]}
+                    alt={item.name}
+                  />
                   <SuggestionText>{item.name}</SuggestionText>
                 </SuggestionRow>
               ))}
@@ -352,7 +409,10 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
         </SearchContainer>
 
         <NavLinks>
-          <StyledNavLink to="/notifications" style={{ position: 'relative' }}>
+          <StyledNavLink
+            to="/notifications"
+            style={{ position: 'relative' }}
+          >
             Notifications
             {unreadCount > 0 && (
               <NotificationBadge>{unreadCount}</NotificationBadge>
@@ -360,7 +420,15 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
           </StyledNavLink>
           <StyledNavLink to="/messages">Messages</StyledNavLink>
           <StyledNavLink to="/sell-item">Sell Your Item</StyledNavLink>
-          <StyledNavLink to="/bookmarks">Cart</StyledNavLink>
+          <StyledNavLink
+            to="/cart"
+            style={{ position: 'relative' }}
+          >
+            <CartIcon src={cartIcon} alt="Cart" />
+            {bookmarks.length > 0 && (
+              <NotificationBadge>{bookmarks.length}</NotificationBadge>
+            )}
+          </StyledNavLink>
         </NavLinks>
       </Navbar>
 

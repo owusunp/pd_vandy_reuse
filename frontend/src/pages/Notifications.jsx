@@ -5,7 +5,7 @@ import { useUnreadCount } from '../UnreadCountContext';
 const Notifications = () => {
   const [sellingNotifications, setSellingNotifications] = useState([]);
   const [buyingNotifications, setBuyingNotifications] = useState([]);
-  const [filter, setFilter] = useState('Buying');
+  const [filter, setFilter] = useState('Selling');
   const { setUnreadCount } = useUnreadCount();
 
   useEffect(() => {
@@ -159,6 +159,7 @@ const styles = {
     maxWidth: '100vw',
     backgroundColor: '#f5f8fa',
     fontFamily: 'Arial, sans-serif',
+    marginTop: '50px',
   },
   title: {
     fontSize: '2rem',

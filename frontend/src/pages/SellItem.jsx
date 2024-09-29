@@ -17,7 +17,7 @@ const SellItemContainer = styled.div`
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #B3A369;
+  color: #333;
   margin-bottom: 1.5rem;
   text-align: center;
 `;
@@ -83,7 +83,7 @@ const TextArea = styled.textarea`
 const SubmitButton = styled.button`
   padding: 1rem;
   font-size: 1.25rem;
-  background-color: #B3A369;
+  background-color: #333;
   color: white;
   border: none;
   border-radius: 5px;
@@ -205,7 +205,12 @@ const findCategories = (name, description) => {
       sold: false,
       category: findCategories(itemName, description),
     };
-
+    const newNotification = {
+      poster: userName,
+      description: `${description.substring(0, 50)}.`,
+      date_posted: new Date().toISOString(),
+      is_read: false,
+    }
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/v1/items/', newItem);
       newItem._id = response.data; // Assuming the response contains the new item's ID
@@ -214,6 +219,16 @@ const findCategories = (name, description) => {
       setItems(prevItems => [...prevItems, newItem]);
 
       alert("Item posted successfully!");
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/v1/notifications/sell_notification', newNotification);
+        if (response.status === 200) {
+
+        }
+      }
+      catch (error) {
+        console.error('Error posting notification:', error.response ? error.response.data : error.message);
+        alert('Error posting notification');
+      }
     } catch (error) {
       console.error('Error creating item:', error.response ? error.response.data : error.message);
       alert("Failed to post item.");

@@ -3,9 +3,9 @@ import ItemComponent from '../components/ItemComponent';
 
 const Bookmarks = ({ bookmarks, toggleBookmark }) => {
   return (
-    <div style={{ padding: '2rem', maxWidth: '100vw' }}>
+    <div style={{ padding: '2rem', maxWidth: '100vw', marginTop: '70px'}}>
       <h1>Bookmarked Items</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
         {bookmarks.map((item) => (
           item && item._id && (
             <ItemComponent

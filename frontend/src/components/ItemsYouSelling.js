@@ -86,6 +86,7 @@ const ItemsYouSelling = () => {
 const styles = {
   container: {
     padding: '2rem',
+    marginTop: '50px',
   },
   itemList: {
     listStyleType: 'none',
