@@ -58,7 +58,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV '/Users/owusunp/pd_vandy_reuse/.venv'
+set -gx VIRTUAL_ENV /workspaces/pd_vandy_reuse/.venv
 
 # https://github.com/fish-shell/fish-shell/issues/436 altered PATH handling
 if test (echo $FISH_VERSION | head -c 1) -lt 3
@@ -66,12 +66,12 @@ if test (echo $FISH_VERSION | head -c 1) -lt 3
 else
     set -gx _OLD_VIRTUAL_PATH $PATH
 end
-set -gx PATH "$VIRTUAL_ENV"'/bin' $PATH
+set -gx PATH "$VIRTUAL_ENV"'/'bin $PATH
 
 # Prompt override provided?
 # If not, just use the environment name.
-if test -n 'pd-vandy-reuse-py3.12'
-    set -gx VIRTUAL_ENV_PROMPT 'pd-vandy-reuse-py3.12'
+if test -n pd-vandy-reuse-py3.12
+    set -gx VIRTUAL_ENV_PROMPT pd-vandy-reuse-py3.12
 else
     set -gx VIRTUAL_ENV_PROMPT (basename "$VIRTUAL_ENV")
 end

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import RequestItem from './RequestItem';
+import { BACKEND_URL } from '../config';
 
 const RequestList = () => {
   const [requests, setRequests] = useState([]);
@@ -8,7 +9,7 @@ const RequestList = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/requests');
+        const response = await axios.get(`${BACKEND_URL}/api/v1/requests`);
         setRequests(response.data);
       } catch (error) {
         console.error('Error fetching requests:', error);

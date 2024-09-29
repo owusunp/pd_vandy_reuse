@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../config';
 
 const ItemsYouSelling = () => {
   const [items, setItems] = useState([]);
@@ -10,7 +11,7 @@ const ItemsYouSelling = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/v1/items`);
+        const response = await axios.get(`${BACKEND_URL}/api/v1/items`);
         // Filter items where the vendor is the logged-in user
         const userItems = response.data.filter(item => item.vendor === username);
         // Sort items by their "sold" status, ensuring sold items are at the bottom
@@ -27,7 +28,7 @@ const ItemsYouSelling = () => {
   const handleToggleSoldStatus = async (itemId) => {
     try {
       // Toggle the sold status in the backend and get the updated status
-      const response = await axios.patch(`http://127.0.0.1:8000/api/v1/items/${itemId}`);
+      const response = await axios.patch(`${BACKEND_URL}/api/v1/items/${itemId}`);
       const updatedStatus = response.data.status;  // Capture the new status
 
       // Update the frontend items list with the new status
@@ -44,7 +45,7 @@ const ItemsYouSelling = () => {
   const handleDelete = async (itemId) => {
     try {
       // Send delete request to API
-      await axios.delete(`http://127.0.0.1:8000/api/v1/items/${itemId}`);
+      await axios.delete(`${BACKEND_URL}/api/v1/items/${itemId}`);
       setItems(items.filter((item) => item._id !== itemId)); // Remove deleted item from UI
     } catch (error) {
       console.error('Error deleting item:', error);

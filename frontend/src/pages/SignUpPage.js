@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { BACKEND_URL } from '../config';
 
 const SignUpPage = ({ onSignUp }) => {
   const [username, setUsername] = useState('');
@@ -14,13 +15,13 @@ const SignUpPage = ({ onSignUp }) => {
     e.preventDefault();
     try {
       // Register the user
-      await axios.post('http://localhost:8000/api/v1/register', {
+      await axios.post(`${BACKEND_URL}/api/v1/register`, {
         username,
         password,
       });
 
       // After sign up, automatically log the user in by requesting a token
-      const loginResponse = await axios.post('http://localhost:8000/api/v1/login', {
+      const loginResponse = await axios.post(`${BACKEND_URL}/api/v1/login`, {
         username,
         password,
       });

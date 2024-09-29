@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { BACKEND_URL } from './config';
 
 const ItemsContext = createContext();
 
@@ -9,7 +10,7 @@ export const ItemsProvider = ({ children }) => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/v1/items/');
+        const response = await axios.get(`${BACKEND_URL}/api/v1/items/`);
         setItems(response.data);
       } catch (error) {
         console.error('Error fetching items:', error);

@@ -45,18 +45,18 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV='/Users/owusunp/pd_vandy_reuse/.venv'
+VIRTUAL_ENV=/workspaces/pd_vandy_reuse/.venv
 if ([ "$OSTYPE" = "cygwin" ] || [ "$OSTYPE" = "msys" ]) && $(command -v cygpath &> /dev/null) ; then
     VIRTUAL_ENV=$(cygpath -u "$VIRTUAL_ENV")
 fi
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
-PATH="$VIRTUAL_ENV/bin:$PATH"
+PATH="$VIRTUAL_ENV/"bin":$PATH"
 export PATH
 
-if [ "xpd-vandy-reuse-py3.12" != x ] ; then
-    VIRTUAL_ENV_PROMPT="pd-vandy-reuse-py3.12"
+if [ "x"pd-vandy-reuse-py3.12 != x ] ; then
+    VIRTUAL_ENV_PROMPT=pd-vandy-reuse-py3.12
 else
     VIRTUAL_ENV_PROMPT=$(basename "$VIRTUAL_ENV")
 fi

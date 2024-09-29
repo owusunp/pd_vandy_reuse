@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { BACKEND_URL } from '../config';
 
 const LoginPage = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -13,7 +14,7 @@ const LoginPage = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/login', {
+      const response = await axios.post( `${BACKEND_URL}/api/v1/login`, {
         username,
         password,
       });

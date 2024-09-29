@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useItems } from '../ItemsContext'; // Import the context
 import { CATEGORIES } from '../data/categories';
+import { BACKEND_URL } from '../config';
 
 const SellItemContainer = styled.div`
   display: flex;
@@ -156,7 +157,7 @@ const SellItem = () => {
     });
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/upload/', formData);
+      const response = await axios.post(`${BACKEND_URL}/api/v1/upload/`, formData);
       return response.data.imageUrls; // Assuming the response contains the URLs of the uploaded images
     } catch (error) {
       console.error('Error uploading images:', error.response ? error.response.data : error.message);
@@ -212,7 +213,7 @@ const findCategories = (name, description) => {
       is_read: false,
     }
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/items/', newItem);
+      const response = await axios.post(`${BACKEND_URL}/api/v1/items/`, newItem);
       newItem._id = response.data; // Assuming the response contains the new item's ID
 
       // Update the items context with the new item
@@ -220,7 +221,7 @@ const findCategories = (name, description) => {
 
       alert("Item posted successfully!");
       try {
-        const response = await axios.post('http://127.0.0.1:8000/api/v1/notifications/sell_notification', newNotification);
+        const response = await axios.post(`${BACKEND_URL}/api/v1/notifications/sell_notification`, newNotification);
         if (response.status === 200) {
 
         }
