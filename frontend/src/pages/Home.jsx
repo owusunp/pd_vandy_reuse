@@ -52,7 +52,7 @@ const Home = ({ bookmarks, toggleBookmark }) => {
             item={item}
             bookmarks={bookmarks}
             toggleBookmark={toggleBookmark}
-            style={{ height: '300px', width: '320px', overflow: 'hidden' }} // Set consistent height
+            style={{ height: '290px', width: '300px', overflow: 'hidden' }} // Set consistent height
           />
         ))}
       </div>

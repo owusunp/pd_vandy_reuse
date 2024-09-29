@@ -7,9 +7,9 @@ import {
   ChannelHeader,
   MessageList,
   MessageInput,
+  Avatar,
 } from 'stream-chat-react';
 import '../../node_modules/stream-chat-react/dist/css/v2/index.css'; // Stream pre-built CSS
-import { useNavigate } from 'react-router-dom';
 
 const apiKey = 'wh9yrcrxaqss'; // Replace with your Stream.io API key
 const channelId = 'public-chat-channel'; // Unique ID for the public channel
@@ -18,7 +18,6 @@ const RequestItem = () => {
   const [client, setClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [username, setUsername] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const initChat = async () => {
@@ -30,40 +29,42 @@ const RequestItem = () => {
         return;
       }
 
-      const chatClient = StreamChat.getInstance(apiKey);
+      // Check if there's an existing client
+      if (client && client.userID !== userName) {
+        // Disconnect previous user if switching accounts
+        await client.disconnectUser();
+        setClient(null); // Reset client state
+      }
 
-      try {
-        await chatClient.connectUser(
-          {
-            id: userName,
-            name: userName,
-          },
-          userToken
-        );
+      if (!client) {
+        const chatClient = StreamChat.getInstance(apiKey);
 
-        const channel = chatClient.channel('livestream', channelId, {
-          name: 'Public Item Requests Channel',
-        });
+        try {
+          await chatClient.connectUser(
+            {
+              id: userName,
+              name: userName,
+            },
+            userToken
+          );
 
-        await channel.watch();
+          setClient(chatClient);
+          setUsername(userName);
 
-        setClient(chatClient);
-        setChannel(channel);
-        setUsername(userName);
-      } catch (error) {
-        console.error('Error connecting to chat:', error);
+          const newChannel = chatClient.channel('livestream', channelId, {
+            name: 'Public Item Requests Channel',
+          });
+
+          await newChannel.watch();
+          setChannel(newChannel);
+        } catch (error) {
+          console.error('Error connecting to chat:', error);
+        }
       }
     };
 
     initChat();
-
-    return () => {
-      // Ensure the client disconnects only if it has been initialized
-      if (client) {
-        client.disconnectUser();
-      }
-    };
-  }, []);
+  }, [client, channel]);
 
   if (!client || !channel) {
     return <div>Loading chat...</div>;
@@ -77,6 +78,14 @@ const RequestItem = () => {
         <Channel channel={channel}>
           <Window>
             <ChannelHeader title="Public Item Requests" />
+            {/* Custom Circle Avatar */}
+            <div style={styles.avatarContainer}>
+              <Avatar
+                image={client.user?.image} // Use the user image if available
+                name={client.user?.name || username} // Display initials based on the name if no image
+                size={50} // Adjust the size of the avatar
+              />
+            </div>
             <MessageList messageFilters={{ limit: 100 }} />
             <MessageInput placeholder="Type your request here..." />
           </Window>
@@ -86,7 +95,7 @@ const RequestItem = () => {
   );
 };
 
-// Inline styles to customize the appearance
+// Styles for Avatar and other components
 const styles = {
   container: {
     padding: '2rem',
@@ -100,6 +109,17 @@ const styles = {
     marginBottom: '1rem',
     textAlign: 'center',
     color: '#333',
+  },
+  avatarContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '60px',
+    height: '60px',
+    borderRadius: '50%', // Makes the container circular
+    backgroundColor: '#eee', // Background color for the avatar circle
+    margin: '20px auto', // Center the avatar with some margin
+    boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)', // Optional: Adds a soft shadow effect
   },
 };
 

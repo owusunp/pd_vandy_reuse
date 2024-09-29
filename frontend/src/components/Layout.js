@@ -9,7 +9,7 @@ import axios from 'axios';
 import { useUnreadCount } from '../UnreadCountContext';
 import cartIcon from '../assets/images/cart.jpg';
 import { StreamChat } from 'stream-chat';
-
+import { useItems } from '../ItemsContext';
 // Styled Components
 const Navbar = styled.nav`
   display: flex;
@@ -268,6 +268,7 @@ const Layout = ({
   const location = useLocation();
   const suggestionsBoxRef = useRef(null);
   const lastScrollY = useRef(0);
+  const {items} = useItems();
 
   useEffect(() => {
     const token = sessionStorage.getItem('streamToken');
@@ -279,29 +280,11 @@ const Layout = ({
     }
   }, []);
 
-  const fetchItems = async () => {
-    try {
-      if (sessionStorage.getItem('items')) {
-        return JSON.parse(sessionStorage.getItem('items'));
-      }
-      const response = await axios.get(
-        'http://127.0.0.1:8000/api/v1/items/'
-      );
-      sessionStorage.setItem('items', JSON.stringify(response.data));
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching items:', error);
-      return [];
-    }
-  };
-
   const performSearch = async (searchTerm) => {
     if (searchTerm.trim() === '') {
       setSuggestions([]);
       return;
     }
-
-    const items = await fetchItems();
     const pattern = new RegExp(searchTerm, 'gi');
     let filteredItems = items.filter((item) =>
       pattern.test(item.name)
@@ -418,7 +401,7 @@ const Layout = ({
             to="/request-item"
             style={{ position: 'relative' }}
           >
-            Reuse Vandy Chat
+            Reuse Chatspace
           </StyledNavLink>
           <StyledNavLink to="/messages">Messages</StyledNavLink>
           <StyledNavLink to="/sell-item">Sell Your Item</StyledNavLink>

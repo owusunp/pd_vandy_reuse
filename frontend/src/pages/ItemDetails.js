@@ -16,58 +16,56 @@ const ItemDetails = () => {
   const handleContactSeller = () => {
     const buyer = sessionStorage.getItem('username');
     const seller = item.vendor; // Seller's username (vendor)
-
+    const itemImage = item.list_of_images[currentImageIndex]; // Currently selected item image
+  
     // Ensure buyer and seller are not the same
     if (buyer === seller) {
       alert("You cannot message yourself.");
       return;
     }
-
-    // Redirect to the Messages page with the seller as a query parameter
-    navigate(`/messages?to=${seller}`);
+  
+    // Redirect to the Messages page with the seller as a query parameter and image
+    navigate(`/messages?to=${seller}&image=${encodeURIComponent(itemImage)}`);
   };
-
+  
   const handleThumbnailClick = (index) => {
     setCurrentImageIndex(index);
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.content}>
-        <div style={styles.imageSection}>
-          <div style={styles.thumbnails}>
-            {item.list_of_images.map((imgSrc, index) => (
-              <img
-                key={index}
-                src={imgSrc}
-                alt={`${item.name} thumbnail ${index + 1}`}
-                style={{
-                  ...styles.thumbnail,
-                  border: index === currentImageIndex ? '2px solid #007bff' : '2px solid transparent',
-                }}
-                onClick={() => handleThumbnailClick(index)}
-              />
-            ))}
-          </div>
-          <div style={styles.mainImageContainer}>
+      <div style={styles.imageSection}>
+        <div style={styles.thumbnails}>
+          {item.list_of_images.map((imgSrc, index) => (
             <img
-              src={item.list_of_images[currentImageIndex]}
-              alt={item.name}
-              style={styles.mainImage}
+              key={index}
+              src={imgSrc}
+              alt={`${item.name} thumbnail ${index + 1}`}
+              style={{
+                ...styles.thumbnail,
+                border: index === currentImageIndex ? '2px solid #007bff' : '2px solid transparent',
+              }}
+              onClick={() => handleThumbnailClick(index)}
             />
-          </div>
+          ))}
         </div>
-
+        <div style={styles.mainImageContainer}>
+          <img
+            src={item.list_of_images[currentImageIndex]}
+            alt={item.name}
+            style={styles.mainImage}
+          />
+        </div>
         <div style={styles.itemDetails}>
-          <h2 style={styles.title}>{item.name}</h2>
-          <p style={styles.text}><strong>Category:</strong> {item.category[0]}</p>
-          <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
-          <p style={styles.text}><strong>Price:</strong> {item.price}</p>
-          <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
-          <button onClick={handleContactSeller} style={styles.contactButton}>
-            Contact Seller
-          </button>
-        </div>
+        <h2 style={styles.title}>{item.name}</h2>
+        <p style={styles.text}><strong>Category:</strong> {item.category}</p>
+        <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
+        <p style={styles.text}><strong>Price:</strong> {item.price}</p>
+        <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
+        <button onClick={handleContactSeller} style={styles.contactButton}>
+          Contact Seller
+        </button>
+      </div>
       </div>
     </div>
   );
@@ -84,32 +82,24 @@ const styles = {
   },
   container: {
     display: 'flex',
-    justifyContent: 'center',
+    flexDirection: 'column',
     alignItems: 'center',
     padding: '2rem',
     backgroundColor: '#f5f5f5',
     minHeight: '100vh',
     marginTop: '70px',
   },
-  content: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    width: '100%',
-    maxWidth: '1200px',
-  },
   imageSection: {
     display: 'flex',
-    flexDirection: 'row',
     alignItems: 'flex-start',
-    marginRight: '2rem',
+    width: '100%',
+    marginBottom: '2rem',
   },
   thumbnails: {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
-    marginRight: '1rem',
+    marginRight: '20px',
   },
   thumbnail: {
     width: '80px',
@@ -120,9 +110,10 @@ const styles = {
     transition: 'border 0.3s',
   },
   mainImageContainer: {
-    width: '600px', // Fixed width
+    width: '700px', // Fixed width
     height: '500px', // Fixed height
     display: 'flex',
+    marginRight: '20px',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden', // Hide any overflow
@@ -132,7 +123,7 @@ const styles = {
   mainImage: {
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+
   },
   itemDetails: {
     backgroundColor: '#fff',
@@ -166,5 +157,8 @@ const styles = {
     transition: 'background-color 0.3s',
   },
 };
+
+// Note: Inline styles do not support pseudo-classes like :hover. 
+// To add hover effects, consider using CSS classes or styled-components.
 
 export default ItemDetails;
