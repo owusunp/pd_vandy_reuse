@@ -17,3 +17,4 @@ api_router.include_router(upload.router, prefix="/upload", tags=["uploads"])
 
 # Include the notification-related routes
 api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+

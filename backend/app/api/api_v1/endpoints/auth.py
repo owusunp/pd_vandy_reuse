@@ -16,6 +16,7 @@ STREAM_API_SECRET = os.getenv("STREAM_API_SECRET")
 MONGO_CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING")
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 
+# Ensure required environment variables are present
 if not STREAM_API_KEY or not STREAM_API_SECRET:
     raise Exception("STREAM_API_KEY and STREAM_API_SECRET must be set in .env file")
 
@@ -67,19 +68,24 @@ class UserLogin(BaseModel):
 
 @router.post("/login")
 async def login_user(user: UserLogin):
+    # Find the user in the MongoDB database
     existing_user = users_collection.find_one({"username": user.username})
     if not existing_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
     
+    # Verify the password
     if not pwd_context.verify(user.password, existing_user["password"]):
         raise HTTPException(status_code=400, detail="Invalid username or password")
     
-    # Generate the token for the user
+    # Generate a Stream Chat token for the user
     token = generate_token(user.username)
     
-    # Save the logged-in user in the session (store in MongoDB)
-    session_data = {"username": user.username, "token": token}
-    sessions_collection.insert_one(session_data)
+    # Check if the user is already logged in (session exists)
+    existing_session = sessions_collection.find_one({"username": user.username})
+    if not existing_session:
+        # Save the logged-in user in the session (store in MongoDB)
+        session_data = {"username": user.username, "token": token}
+        sessions_collection.insert_one(session_data)
     
     return {
         "message": "Login successful",
@@ -90,7 +96,11 @@ async def login_user(user: UserLogin):
 @router.post("/logout")
 async def logout_user(user: UserLogin):
     # Remove the user from the session collection
-    sessions_collection.delete_one({"username": user.username})
+    deleted_session = sessions_collection.delete_one({"username": user.username})
+    
+    if deleted_session.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="User is not logged in")
+    
     return {"message": "Logout successful"}
 
 # Get the currently logged-in users

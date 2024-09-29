@@ -410,13 +410,10 @@ const Layout = ({
 
         <NavLinks>
           <StyledNavLink
-            to="/notifications"
+            to="/request-item"
             style={{ position: 'relative' }}
           >
-            Notifications
-            {unreadCount > 0 && (
-              <NotificationBadge>{unreadCount}</NotificationBadge>
-            )}
+            Reuse Vandy Chat
           </StyledNavLink>
           <StyledNavLink to="/messages">Messages</StyledNavLink>
           <StyledNavLink to="/sell-item">Sell Your Item</StyledNavLink>

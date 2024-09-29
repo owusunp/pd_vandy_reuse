@@ -8,23 +8,18 @@ import Dashboard from './pages/Dashboard';
 import SellItem from './pages/SellItem';
 import Messages from './pages/Messages';
 import ItemDetails from './pages/ItemDetails';
-import Notifications from './pages/Notifications';
+import RequestItem from './pages/RequestItem'; // Import the new RequestItem component
 import { UnreadCountProvider } from './UnreadCountContext';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import ChatPage from './pages/ChatPage';
 import { ItemsProvider } from './ItemsContext';
-import ItemsYouSelling from './components/ItemsYouSelling'; // Import the new ItemsYouSelling component
+import ItemsYouSelling from './components/ItemsYouSelling'; // Import the ItemsYouSelling component
 
 const App = () => {
   const [bookmarks, setBookmarks] = useState(() => {
     const savedBookmarks = sessionStorage.getItem('bookmarks');
     return savedBookmarks ? JSON.parse(savedBookmarks) : [];
-  });
-
-  const [notificationCount] = useState(() => {
-    const savedCount = sessionStorage.getItem('notificationCount');
-    return savedCount ? parseInt(savedCount, 10) : 0;
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -76,7 +71,7 @@ const App = () => {
               path="*"
               element={
                 <ProtectedRoute>
-                  <Layout notificationCount={notificationCount} isLoggedIn={isLoggedIn} onLogout={handleLogout} bookmarks = {bookmarks}>
+                  <Layout isLoggedIn={isLoggedIn} onLogout={handleLogout} bookmarks={bookmarks}>
                     <Routes>
                       <Route path="/" element={<Home bookmarks={bookmarks} toggleBookmark={toggleBookmark} />} />
                       <Route path="/cart" element={<Bookmarks bookmarks={bookmarks} toggleBookmark={toggleBookmark} />} />
@@ -85,7 +80,8 @@ const App = () => {
                       <Route path="/chat/:channelId" element={<ChatPage />} />
                       <Route path="/item" element={<Dashboard />} />
                       <Route path="/item-details/:id" element={<ItemDetails />} />
-                      <Route path="/notifications" element={<Notifications />} />
+                      <Route path="/request-item" element={<RequestItem />} />
+
                       <Route path="/my-items" element={<ItemsYouSelling />} /> {/* Add MyItemsPage route */}
                     </Routes>
                   </Layout>
