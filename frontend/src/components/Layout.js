@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUnreadCount } from '../UnreadCountContext';
 import searchIcon from '../assets/images/search.jpeg'; // Import search icon
+import cartIcon from '../assets/images/cart.png'; // Import cart icon
 import { CATEGORIES } from '../data/categories'; // Import your CATEGORIES
 import axios from 'axios';
 
@@ -12,11 +13,21 @@ const Navbar = styled.nav`
   align-items: center;
   background-color: black; /* Vanderbilt dark blue */
   padding: 1rem 2rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  max-width: 100vw;
+  z-index: 1000;
+  transform: translateY(${props => (props.visible ? '0' : '-100%')});
+  transition: transform 0.3s ease-in-out;
 `;
 
 const NavLinks = styled.div`
   display: flex;
   gap: 1.5rem;
+  position: relative;
+  left: -40px;
+  top: 8px;
 `;
 
 const StyledNavLink = styled(NavLink)`
@@ -53,6 +64,8 @@ const LogoutButton = styled.button`
   &:hover {
     color: #ECEFF1;
   }
+  position: relative;
+  top: -9px;
 `;
 
 const SearchContainer = styled.div`
@@ -133,12 +146,32 @@ const SuggestionText = styled.span`
   color: #333;
 `;
 
-const Layout = ({ children, isLoggedIn, onLogout, onSearch }) => {
+const CartIcon = styled.img`
+  width: 40px;
+  height: 30px;
+  margin-right: 5px;
+  position:relative;
+  top: -9px;
+`;
+const CartBadge = styled.span`
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 4px 10px;
+  font-size: 12px;
+`;
+
+const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
   const { unreadCount } = useUnreadCount();
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const [navbarVisible, setNavbarVisible] = useState(true);
   const navigate = useNavigate();
   const suggestionsBoxRef = useRef(null);
+  const lastScrollY = useRef(0);
 
   const fetchItems = async () => {
     try {
@@ -157,7 +190,6 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch }) => {
   const performSearch = async (searchTerm) => {
     if (searchTerm.trim() === '') {
       setSuggestions([]);
-      onSearch(''); // Clear the search in Home
       return;
     }
 
@@ -198,16 +230,27 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch }) => {
     }
   };
 
+  const handleScroll = () => {
+    if (window.scrollY < lastScrollY.current) {
+      setNavbarVisible(true);
+    } else {
+      setNavbarVisible(false);
+    }
+    lastScrollY.current = window.scrollY;
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   return (
     <>
-      <Navbar>
+      <Navbar visible={navbarVisible}>
         <NavLink to="/" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 'bold' }}>
           Reuse Vandy
         </NavLink>
@@ -242,7 +285,12 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch }) => {
           </StyledNavLink>
           <StyledNavLink to="/messages">Messages</StyledNavLink>
           <StyledNavLink to="/sell-item">Sell Your Item</StyledNavLink>
-          <StyledNavLink to="/bookmarks">View Bookmarks</StyledNavLink>
+          <StyledNavLink to="/cart" style={{ position: 'relative' }}>
+            <CartIcon src={cartIcon} alt="Cart" />
+            {bookmarks.length > 0 && (
+              <CartBadge>{bookmarks.length}</CartBadge>
+            )}
+          </StyledNavLink>
           {isLoggedIn ? (
             <LogoutButton onClick={onLogout}>Logout</LogoutButton>
           ) : (

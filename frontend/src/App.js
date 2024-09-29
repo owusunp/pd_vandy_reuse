@@ -77,10 +77,10 @@ const App = () => {
               path="*"
               element={
                 <ProtectedRoute>
-                  <Layout notificationCount={notificationCount} isLoggedIn={isLoggedIn} onLogout={handleLogout}>
+                  <Layout notificationCount={notificationCount} isLoggedIn={isLoggedIn} onLogout={handleLogout} bookmarks = {bookmarks}>
                     <Routes>
                       <Route path="/" element={<Home bookmarks={bookmarks} toggleBookmark={toggleBookmark} />} />
-                      <Route path="/bookmarks" element={<Bookmarks bookmarks={bookmarks} toggleBookmark={toggleBookmark} />} />
+                      <Route path="/cart" element={<Bookmarks bookmarks={bookmarks} toggleBookmark={toggleBookmark} />} />
                       <Route path="/sell-item" element={<SellItem />} />
                       <Route path="/messages" element={<Messages />} />
                       <Route path="/chat/:channelId" element={<ChatPage />} />

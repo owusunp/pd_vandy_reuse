@@ -19,7 +19,7 @@ const Home = ({ bookmarks, toggleBookmark }) => {
     : items.filter(item => item.category.some(cat => cat === selectedCategory));
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '100vw' }}>
+    <div style={{ padding: '2rem', maxWidth: '100vw', marginTop: '70px'}}>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         {categories.map((category) => (
           <button
