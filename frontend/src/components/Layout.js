@@ -47,11 +47,11 @@ const StyledNavLink = styled(NavLink)`
 const NotificationBadge = styled.span`
   position: absolute;
   top: -14px;
-  right: -10px;
+  right: -8px;
   background-color: red;
   color: white;
   border-radius: 50%;
-  padding: 4px 10px;
+  padding: 4px 8px;
   font-size: 12px;
 `;
 
@@ -152,16 +152,6 @@ const CartIcon = styled.img`
   margin-right: 5px;
   position:relative;
   top: -9px;
-`;
-const CartBadge = styled.span`
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 4px 10px;
-  font-size: 12px;
 `;
 
 const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
@@ -288,7 +278,7 @@ const Layout = ({ children, isLoggedIn, onLogout, bookmarks }) => {
           <StyledNavLink to="/cart" style={{ position: 'relative' }}>
             <CartIcon src={cartIcon} alt="Cart" />
             {bookmarks.length > 0 && (
-              <CartBadge>{bookmarks.length}</CartBadge>
+              <NotificationBadge>{bookmarks.length}</NotificationBadge>
             )}
           </StyledNavLink>
           {isLoggedIn ? (
