@@ -12,8 +12,9 @@ import {
   ChannelList,
   Avatar,
   TypingIndicator,
-  ReactionSelector, // For adding reactions
-  MessageActions, // For message actions
+  ReactionSelector,
+  MessageActions,
+  MessageSimple,
 } from 'stream-chat-react';
 import '../../node_modules/stream-chat-react/dist/css/v2/index.css'; // Stream pre-built CSS
 
@@ -42,35 +43,36 @@ const Messages = () => {
       try {
         if (!chatClientRef.current) {
           const chatClient = StreamChat.getInstance(apiKey);
-          await chatClient.connectUser(
-            { id: username, name: username },
-            token
-          );
           chatClientRef.current = chatClient;
+          await chatClient.connectUser({ id: username, name: username }, token);
           setClient(chatClient);
 
-          // Fetch all existing channels for the user
+          // Fetch all existing channels for the user instantly
           const filter = { type: 'messaging', members: { $in: [username] } };
           const sort = [{ last_message_at: -1 }];
           const userChannels = await chatClient.queryChannels(filter, sort);
 
-          setChannels(userChannels); // Set all the fetched channels
+          setChannels(userChannels); // Set fetched channels instantly
 
-          // If there is a seller, set up a conversation
+          // Automatically start the chat with the seller if passed
           if (seller) {
-            const channel = chatClientRef.current.channel('messaging', {
+            const channel = chatClient.channel('messaging', {
               members: [username, seller],
             });
-
             await channel.watch();
             setActiveChannel(channel);
 
-            // If an image URL is provided, send it automatically as a message
             if (imageUrl) {
-              channel.sendMessage({
-                text: "I am interested in this item.",
-                attachments: [{ type: 'image', asset_url: imageUrl }],
-              });
+              console.log('Sending image with URL:', imageUrl); // Add this line for debugging
+              try {
+                const response = await channel.sendMessage({
+                  text: "I am interested in this item.",
+                  attachments: [{ type: 'image', image_url: imageUrl }],
+                });
+                console.log('Message sent successfully:', response);
+              } catch (error) {
+                console.error('Error sending message with image:', error);
+              }
             }
           }
         }
@@ -82,8 +84,9 @@ const Messages = () => {
     initChat();
   }, [location.search]);
 
-  const handleChannelSelect = (channel) => {
-    setActiveChannel(channel);
+  const handleChannelSelect = async (channel) => {
+    setActiveChannel(channel); // Select the active channel instantly
+    await channel.watch(); // Ensure that the channel is ready for display
   };
 
   if (!client) {
@@ -95,63 +98,48 @@ const Messages = () => {
       <div style={styles.container}>
         {/* Channel list showing all users the current user has interacted with */}
         <div style={styles.channelList}>
-          {channels.map((channel) => {
-            const members = Object.values(channel.state.members);
-            const otherMember = members.find(
-              (member) => member.user.id !== sessionStorage.getItem('username')
-            );
-            const displayName =
-              otherMember?.user?.name || otherMember?.user?.id || 'user';
-            const unreadCount = channel.countUnread();
+          <ChannelList
+            filters={{ type: 'messaging', members: { $in: [sessionStorage.getItem('username')] } }}
+            sort={{ last_message_at: -1 }}
+            onSelect={handleChannelSelect}
+            Preview={(props) => {
+              const otherMember = Object.values(props.channel.state.members).find(
+                (member) => member.user.id !== sessionStorage.getItem('username')
+              );
+              const displayName = otherMember?.user?.name || 'user';
+              const unreadCount = props.channel.countUnread();
 
-            // Get the last message and determine its type
-            const lastMessageIndex = channel.state.messages.length - 1;
-            const lastMessageObj =
-              lastMessageIndex >= 0
-                ? channel.state.messages[lastMessageIndex]
-                : null;
-            let lastMessagePreview = 'Start a conversation'; // Default message if no messages exist
-
-            if (lastMessageObj) {
-              if (lastMessageObj.attachments && lastMessageObj.attachments.length > 0) {
-                lastMessagePreview = 'Sent a photo';
-              } else if (lastMessageObj.text) {
-                lastMessagePreview = lastMessageObj.text;
-              }
-            }
-
-            return (
-              <div
-                key={channel.id}
-                onClick={() => handleChannelSelect(channel)}
-                style={styles.channelPreview}
-              >
-                <div style={styles.avatarContainer}>
-                  <Avatar
-                    image={otherMember?.user?.image || ''} // Use image if available, fallback to initials
-                    name={displayName} // Display initials based on the name if no image
-                    size={40}
-                    presenceIndicator
-                  />
-                </div>
-                <div style={styles.channelInfo}>
-                  <div
-                    style={{
-                      fontWeight: unreadCount > 0 ? 'bold' : 'normal',
-                    }}
-                  >
-                    {displayName}
-                    {unreadCount > 0 && (
-                      <span style={styles.unreadBadge}>{unreadCount}</span>
-                    )}
+              return (
+                <div
+                  key={props.channel.id}
+                  onClick={() => handleChannelSelect(props.channel)}
+                  style={styles.channelPreview}
+                >
+                  <div style={styles.avatarContainer}>
+                    <Avatar
+                      image={otherMember?.user?.image || ''} // Use image if available, fallback to initials
+                      name={displayName}
+                      size={40}
+                      presenceIndicator
+                    />
                   </div>
-                  <div style={styles.lastMessage}>
-                    {lastMessagePreview}
+                  <div style={styles.channelInfo}>
+                    <div style={{ fontWeight: unreadCount > 0 ? 'bold' : 'normal' }}>
+                      {displayName}
+                      {unreadCount > 0 && (
+                        <span style={styles.unreadBadge}>{unreadCount}</span>
+                      )}
+                    </div>
+                    <div style={styles.lastMessage}>
+                      {props.channel.state.messages.length > 0
+                        ? props.channel.state.messages[props.channel.state.messages.length - 1].text || 'Sent a photo'
+                        : 'Start a conversation'}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            }}
+          />
         </div>
 
         {/* Message window displaying selected conversation */}
@@ -171,6 +159,13 @@ const Messages = () => {
                   showReadStatus
                   typingIndicator={<TypingIndicator channel={activeChannel} />}
                   reactionSelector={(message) => <ReactionSelector message={message} />}
+                  Message={(messageProps) => {
+                    console.log('Message props:', messageProps);
+                    if (messageProps.message) {
+                      console.log('Message attachments:', messageProps.message.attachments);
+                    }
+                    return <MessageSimple {...messageProps} />;
+                  }}
                 />
                 <MessageInput
                   mentionAutocomplete
@@ -197,6 +192,7 @@ const styles = {
   container: {
     display: 'flex',
     height: '100vh',
+    marginTop: '70px',
   },
   channelList: {
     width: '30%',

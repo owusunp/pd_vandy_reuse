@@ -15,16 +15,16 @@ const ItemDetails = () => {
 
   const handleContactSeller = () => {
     const buyer = sessionStorage.getItem('username');
-    const seller = item.vendor; // Seller's username (vendor)
-    const itemImage = item.list_of_images[currentImageIndex]; // Currently selected item image
-  
-    // Ensure buyer and seller are not the same
+    const seller = item.vendor;
+    const itemImage = item.list_of_images[currentImageIndex];
+    
+    console.log("Original Image URL:", itemImage); // Log the original URL
+
     if (buyer === seller) {
       alert("You cannot message yourself.");
       return;
     }
-  
-    // Redirect to the Messages page with the seller as a query parameter and image
+
     navigate(`/messages?to=${seller}&image=${encodeURIComponent(itemImage)}`);
   };
   
@@ -57,20 +57,19 @@ const ItemDetails = () => {
           />
         </div>
         <div style={styles.itemDetails}>
-        <h2 style={styles.title}>{item.name}</h2>
-        <p style={styles.text}><strong>Category:</strong> {item.category}</p>
-        <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
-        <p style={styles.text}><strong>Price:</strong> {item.price}</p>
-        <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
-        <button onClick={handleContactSeller} style={styles.contactButton}>
-          Contact Seller
-        </button>
-      </div>
+          <h2 style={styles.title}>{item.name}</h2>
+          <p style={styles.text}><strong>Category:</strong> {item.category}</p>
+          <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
+          <p style={styles.text}><strong>Price:</strong> {item.price}</p>
+          <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
+          <button onClick={handleContactSeller} style={styles.contactButton}>
+            Contact Seller
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-
 const styles = {
   notFound: {
     display: 'flex',
