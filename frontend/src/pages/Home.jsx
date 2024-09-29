@@ -45,7 +45,7 @@ const Home = ({ bookmarks, toggleBookmark }) => {
       </div>
 
       {/* Display Filtered and Sorted Items */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
         {sortedItems.map((item) => (
           <ItemComponent
             key={item._id}

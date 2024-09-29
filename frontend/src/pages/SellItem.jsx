@@ -127,7 +127,7 @@ const RemoveButton = styled.button`
 const SellItem = () => {
   const { setItems } = useItems(); // Get setItems from context
   const [itemName, setItemName] = useState('');
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(sessionStorage.getItem('username'));
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [images, setImages] = useState([]);
@@ -245,13 +245,6 @@ const findCategories = (name, description) => {
     <SellItemContainer>
       <Title>Sell Your Item</Title>
       <Form onSubmit={handleSubmit}>
-        <Label>Enter your name</Label>
-        <Input
-          type="text"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          required
-        />
         <Label>Item Name</Label>
         <Input
           type="text"
@@ -277,7 +270,7 @@ const findCategories = (name, description) => {
             style={{ borderRadius: '0 5px 5px 0' }}
           />
         </PriceInputContainer>
-        <Label>Upload Image</Label>
+        <Label>Upload Image <span style={{ fontWeight: 'normal' }}>(You can upload up to 3 images)</span> </Label>
         <Input
           type="file"
           multiple accept="image/*"

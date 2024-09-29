@@ -35,7 +35,7 @@ const ItemComponent = ({ item, bookmarks = [], toggleBookmark, style }) => {
         <img
           src={item.list_of_images[currentImageIndex]}
           alt={item.name}
-          style={{ height: '220px', width: '300px' }}
+          style={{ height: '220px', width: '290px' }}
         />
         <h2 style={item.status === 'sold' ? styles.soldText : {}}>{item.name}</h2>
         <p>{item.price}</p>
