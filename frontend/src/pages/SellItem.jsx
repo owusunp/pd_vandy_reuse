@@ -277,7 +277,7 @@ const findCategories = (name, description) => {
             style={{ borderRadius: '0 5px 5px 0' }}
           />
         </PriceInputContainer>
-        <Label>Upload Image</Label>
+        <Label>Upload Image <span style={{ fontWeight: 'normal' }}>(You can upload up to 3 images)</span> </Label>
         <Input
           type="file"
           multiple accept="image/*"

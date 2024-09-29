@@ -59,9 +59,9 @@ const ItemDetails = () => {
 
       <div style={styles.itemDetails}>
         <h2 style={styles.title}>{item.name}</h2>
-        <p style={styles.text}><strong>Category:</strong> {item.category}</p>
+        <p style={styles.text}><strong>Category:</strong> {item.category[0]}</p>
         <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
-        <p style={styles.text}><strong>Price:</strong> ${item.price}</p>
+        <p style={styles.text}><strong>Price:</strong> {item.price}</p>
         <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
         <button onClick={handleContactSeller} style={styles.contactButton}>
           Contact Seller

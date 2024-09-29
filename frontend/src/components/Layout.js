@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import searchIcon from '../assets/images/search.jpeg';
-import randomLogo from '../assets/images/random-logo.png';
-import allIcon from '../assets/images/all-icon.png';
+import vandyLogo from '../assets/images/VandyLogo.png';
+import allIcon from '../assets/images/menu.png';
 import { CATEGORIES } from '../data/categories';
 import axios from 'axios';
 import { useUnreadCount } from '../UnreadCountContext';
-import cartIcon from '../assets/images/cart.png';
+import cartIcon from '../assets/images/cart.jpg';
 import { StreamChat } from 'stream-chat';
 
 // Styled Components
@@ -15,7 +15,7 @@ const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
+  background-color: #212325;
   padding: 1rem 2rem;
   position: fixed;
   top: 0;
@@ -30,7 +30,7 @@ const NavLinks = styled.div`
   display: flex;
   gap: 1.5rem;
   position: relative;
-  left: -40px;
+  left: -60px;
   top: 8px;
 `;
 
@@ -87,7 +87,7 @@ const AllButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: black;
+  background-color: #212325;
   color: white;
   font-weight: bold;
   border: none;
@@ -98,8 +98,8 @@ const AllButton = styled.button`
   }
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 23px;
+    height: 23px;
   }
 `;
 
@@ -248,7 +248,8 @@ const CartIcon = styled.img`
   height: 30px;
   margin-right: 5px;
   position: relative;
-  top: -9px;
+  top: -8px;
+  left: -5px;
 `;
 
 const Layout = ({
@@ -373,7 +374,7 @@ const Layout = ({
       <Navbar visible={navbarVisible}>
         <NavLeft>
           <Logo
-            src={randomLogo}
+            src={vandyLogo}
             alt="Logo"
             onClick={() => navigate('/')}
           />
@@ -409,6 +410,7 @@ const Layout = ({
         </SearchContainer>
 
         <NavLinks>
+        <StyledNavLink to="/">Home</StyledNavLink>
           <StyledNavLink
             to="/notifications"
             style={{ position: 'relative' }}
