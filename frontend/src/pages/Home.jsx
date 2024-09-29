@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ItemComponent from '../components/ItemComponent'; // Adjust the import path as necessary
 import { useItems } from '../ItemsContext';
 
@@ -6,20 +6,25 @@ const categories = ['All', 'Clothing', 'Shoes', 'Accessories', 'Electronics', 'R
 
 const Home = ({ bookmarks, toggleBookmark }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const {items} = useItems();
+  const { items } = useItems();
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
   };
 
+  // Filter items based on selected category and sort sold items to the bottom
   const filteredItems = selectedCategory === 'All'
     ? items
     : selectedCategory === 'Room'
     ? items.filter(item => item.category.some(cat => cat === 'Room' || cat === 'Kitchen'))
     : items.filter(item => item.category.some(cat => cat === selectedCategory));
 
+  // Sort filtered items such that sold items appear at the bottom
+  const sortedItems = filteredItems.sort((a, b) => (a.status === 'sold' ? 1 : -1));
+
   return (
     <div style={{ padding: '2rem', maxWidth: '100vw' }}>
+      {/* Category Buttons */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         {categories.map((category) => (
           <button
@@ -39,8 +44,9 @@ const Home = ({ bookmarks, toggleBookmark }) => {
         ))}
       </div>
 
+      {/* Display Filtered and Sorted Items */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
-        {filteredItems.map((item) => (
+        {sortedItems.map((item) => (
           <ItemComponent
             key={item._id}
             item={item}

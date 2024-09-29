@@ -1,6 +1,6 @@
-# app/api/api_v1/endpoints/items.py
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId  # Import ObjectId to handle MongoDB IDs
 import os
 from dotenv import load_dotenv
 from app.api.api_v1.models.item import Item
@@ -15,7 +15,7 @@ collection = db["items"]  # Collection name
 
 router = APIRouter()
 
-# Get all items from database
+# Get all items from the database
 @router.get("/")
 async def read_items():
     items = []
@@ -24,7 +24,7 @@ async def read_items():
         items.append(item)
     return items
 
-#Create a new item
+# Create a new item
 @router.post("/")
 async def create_item(item: Item):
     item_dict = item.dict()
@@ -33,3 +33,33 @@ async def create_item(item: Item):
         return str(result.inserted_id)
     else:
         raise HTTPException(status_code=500, detail="Item creation failed")
+
+# Delete an item by ID
+@router.delete("/{item_id}")
+async def delete_item(item_id: str):
+    result = await collection.delete_one({"_id": ObjectId(item_id)})
+    if result.deleted_count == 1:
+        return {"status": "Item deleted"}
+    else:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+# Patch to toggle the sold status
+@router.patch("/{item_id}")
+async def toggle_sold_status(item_id: str):
+    item = await collection.find_one({"_id": ObjectId(item_id)})
+    
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    # Toggle status between 'sold' and 'available'
+    new_status = "available" if item.get("status") == "sold" else "sold"
+    
+    result = await collection.update_one(
+        {"_id": ObjectId(item_id)},
+        {"$set": {"status": new_status}}
+    )
+    
+    if result.modified_count == 1:
+        return {"status": new_status}  # Return the updated status
+    else:
+        raise HTTPException(status_code=500, detail="Failed to update item status")

@@ -371,6 +371,7 @@ const Layout = ({ children, isLoggedIn, onLogout, onSearch = () => {} }) => {
           Hello, {username}
           <CloseButton onClick={closeDropdown}>&times;</CloseButton>
         </DropdownHeader>
+        <DropdownItem onClick={() => navigate('/my-items')}>Items You Selling</DropdownItem>
         <DropdownItem onClick={() => navigate('/change-profile')}>Change Profile</DropdownItem>
         <DropdownItem onClick={onLogout}>Logout</DropdownItem>
       </AllDropdown>
