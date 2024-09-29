@@ -61,7 +61,7 @@ const ItemsYouSelling = () => {
               <img src={item.list_of_images[0]} alt={item.name} style={styles.image} />
               <div style={styles.details}>
                 <p><strong>{item.name}</strong></p>
-                <p>Price: ${item.price}</p>
+                <p>Price: {item.price}</p>
                 <p>Status: {item.status}</p>
                 <button style={styles.button} onClick={() => handleToggleSoldStatus(item._id)}>
                   {item.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}

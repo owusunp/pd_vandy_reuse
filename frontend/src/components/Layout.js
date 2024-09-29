@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import searchIcon from '../assets/images/search.jpeg';
 import vandyLogo from '../assets/images/VandyLogo.png';
@@ -265,6 +265,7 @@ const Layout = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const suggestionsBoxRef = useRef(null);
   const lastScrollY = useRef(0);
 
@@ -355,7 +356,9 @@ const Layout = ({
     if (window.scrollY < lastScrollY.current) {
       setNavbarVisible(true);
     } else {
-      setNavbarVisible(false);
+      if (!location.pathname.includes('/messages'))
+      {
+      setNavbarVisible(false);}
     }
     lastScrollY.current = window.scrollY;
   };

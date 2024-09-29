@@ -33,39 +33,41 @@ const ItemDetails = () => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.imageSection}>
-        <div style={styles.thumbnails}>
-          {item.list_of_images.map((imgSrc, index) => (
+      <div style={styles.content}>
+        <div style={styles.imageSection}>
+          <div style={styles.thumbnails}>
+            {item.list_of_images.map((imgSrc, index) => (
+              <img
+                key={index}
+                src={imgSrc}
+                alt={`${item.name} thumbnail ${index + 1}`}
+                style={{
+                  ...styles.thumbnail,
+                  border: index === currentImageIndex ? '2px solid #007bff' : '2px solid transparent',
+                }}
+                onClick={() => handleThumbnailClick(index)}
+              />
+            ))}
+          </div>
+          <div style={styles.mainImageContainer}>
             <img
-              key={index}
-              src={imgSrc}
-              alt={`${item.name} thumbnail ${index + 1}`}
-              style={{
-                ...styles.thumbnail,
-                border: index === currentImageIndex ? '2px solid #007bff' : '2px solid transparent',
-              }}
-              onClick={() => handleThumbnailClick(index)}
+              src={item.list_of_images[currentImageIndex]}
+              alt={item.name}
+              style={styles.mainImage}
             />
-          ))}
+          </div>
         </div>
-        <div style={styles.mainImageContainer}>
-          <img
-            src={item.list_of_images[currentImageIndex]}
-            alt={item.name}
-            style={styles.mainImage}
-          />
-        </div>
-      </div>
 
-      <div style={styles.itemDetails}>
-        <h2 style={styles.title}>{item.name}</h2>
-        <p style={styles.text}><strong>Category:</strong> {item.category[0]}</p>
-        <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
-        <p style={styles.text}><strong>Price:</strong> {item.price}</p>
-        <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
-        <button onClick={handleContactSeller} style={styles.contactButton}>
-          Contact Seller
-        </button>
+        <div style={styles.itemDetails}>
+          <h2 style={styles.title}>{item.name}</h2>
+          <p style={styles.text}><strong>Category:</strong> {item.category[0]}</p>
+          <p style={styles.text}><strong>Seller Note:</strong> {item.description}</p>
+          <p style={styles.text}><strong>Price:</strong> {item.price}</p>
+          <p style={styles.text}><strong>Seller:</strong> {item.vendor}</p>
+          <button onClick={handleContactSeller} style={styles.contactButton}>
+            Contact Seller
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -82,25 +84,32 @@ const styles = {
   },
   container: {
     display: 'flex',
-    flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: '2rem',
     backgroundColor: '#f5f5f5',
     minHeight: '100vh',
     marginTop: '70px',
   },
+  content: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    width: '100%',
+    maxWidth: '1200px',
+  },
   imageSection: {
     display: 'flex',
+    flexDirection: 'row',
     alignItems: 'flex-start',
-    width: '100%',
-    maxWidth: '800px',
-    marginBottom: '2rem',
+    marginRight: '2rem',
   },
   thumbnails: {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
-    marginRight: '20px',
+    marginRight: '1rem',
   },
   thumbnail: {
     width: '80px',
@@ -123,7 +132,7 @@ const styles = {
   mainImage: {
     width: '100%',
     height: '100%',
-
+    objectFit: 'cover',
   },
   itemDetails: {
     backgroundColor: '#fff',
@@ -131,7 +140,7 @@ const styles = {
     borderRadius: '8px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     width: '100%',
-    maxWidth: '800px',
+    maxWidth: '400px',
     textAlign: 'left',
   },
   title: {
@@ -157,8 +166,5 @@ const styles = {
     transition: 'background-color 0.3s',
   },
 };
-
-// Note: Inline styles do not support pseudo-classes like :hover. 
-// To add hover effects, consider using CSS classes or styled-components.
 
 export default ItemDetails;

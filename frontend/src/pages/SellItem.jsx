@@ -127,7 +127,7 @@ const RemoveButton = styled.button`
 const SellItem = () => {
   const { setItems } = useItems(); // Get setItems from context
   const [itemName, setItemName] = useState('');
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(sessionStorage.getItem('username'));
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [images, setImages] = useState([]);
@@ -245,13 +245,6 @@ const findCategories = (name, description) => {
     <SellItemContainer>
       <Title>Sell Your Item</Title>
       <Form onSubmit={handleSubmit}>
-        <Label>Enter your name</Label>
-        <Input
-          type="text"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          required
-        />
         <Label>Item Name</Label>
         <Input
           type="text"
