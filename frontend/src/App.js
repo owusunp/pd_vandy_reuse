@@ -1,5 +1,3 @@
-// App.js
-
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -16,6 +14,7 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import ChatPage from './pages/ChatPage';
 import { ItemsProvider } from './ItemsContext';
+import ItemsYouSelling from './components/ItemsYouSelling'; // Import the new ItemsYouSelling component
 
 const App = () => {
   const [bookmarks, setBookmarks] = useState(() => {
@@ -34,7 +33,7 @@ const App = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = (username, token) => { // Correct parameter order
+  const handleLogin = (username, token) => { 
     sessionStorage.setItem('authToken', token);
     sessionStorage.setItem('username', username);
     setIsLoggedIn(true);
@@ -87,6 +86,7 @@ const App = () => {
                       <Route path="/item" element={<Dashboard />} />
                       <Route path="/item-details/:id" element={<ItemDetails />} />
                       <Route path="/notifications" element={<Notifications />} />
+                      <Route path="/my-items" element={<ItemsYouSelling />} /> {/* Add MyItemsPage route */}
                     </Routes>
                   </Layout>
                 </ProtectedRoute>
