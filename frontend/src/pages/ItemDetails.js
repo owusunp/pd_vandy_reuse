@@ -9,8 +9,8 @@ const ItemDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const {items} = useItems();
-  const item = items.find(item => item._id === id);
+  const { items } = useItems();
+  const item = items.find((item) => item._id === id);
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % item.list_of_images.length);
